@@ -22,6 +22,8 @@ TEST*
 /btree_lab/
 
 *.data
+*.config
+*.bitmap
 
 .DS_STORE
 
