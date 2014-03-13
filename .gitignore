@@ -1,3 +1,7 @@
+# Ignore non-source code
+*
+!*.*
+
 # Object files
 *.o
 *.ko
