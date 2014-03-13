@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "btree.h"
-#include "math.h"
 
 KeyValuePair::KeyValuePair()
 {}
@@ -240,9 +239,10 @@ ERROR_T BTreeIndex::LookupOrUpdateInternal(const SIZE_T &node,
           return b.GetVal(offset,value);
       	} else { 
           // BTREE_OP_UPDATE
-          // WRITE ME => Finished...I think   -PW
+          // WRITE ME
           b.SetVal(offset, value);
-          return b.Serialize(buffercache, node);
+          
+          return ERROR_NOERROR;
       	}
       }
     }
@@ -361,162 +361,61 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   ERROR_T rc;
   SIZE_T offset;
   KEY_T testkey;
-  
-
-  SIZE_T leaf;
-  SIZE_T& ptr = leaf;
-  // Look up where the key should be inserted. Get a pointer for it. 
-  rc = LookupForInsert(superblock.info.rootnode, key, ptr);
-
-  // Standard error checking
-  if (rc!=ERROR_NOERROR) {
-    return rc;
-  }
-
-  // Unserialize our node
-  b.Unserialize(buffercache, ptr);
-
-  // Now, let's search where to insert
-  for (offset=0;offset<b.info.numkeys;offset++) { 
-    // Get the key value
-    rc=b.GetKey(offset,testkey);
-    // Do standard error checking
-    if (rc) {  return rc; }
-
-    // If we find something
-    if(testkey>key) {
-      // then break out of the loop
-      break;
-    }
-  }
-
-  // Offset holds the position to the left of where we want to insert; let's insert!
-  // We have to move each block over to the right by one. Start at the end which must
-  // be empty (we're defining full as 2/3 full, so no leaf is ever completely full)
-  for (SIZE_T position = b.info.numkeys; position > offset; position--) {
-    SIZE_T prev;
-    b.GetPtr(position-1, prev);
-
-    b.SetPtr(position, prev);
-  }
-
-  // NOTE: Where should be set the parent pointer?
-
-  // Now that we've moved everything to the right, insert at the hole that is at offset+1
-  SIZE_T newNode;
-  SIZE_T& newNodePtr = newNode;
-  // AllocateNode passes the value by reference to newNodePtr, doesn't return it's value
-  rc = AllocateNode(newNodePtr);
-
-  // Store this new node's pointer into the list of the old one
-  b.SetPtr(offset, newNodePtr);
-  // We've added one new key, so increment numkeys
-  b.info.numkeys = b.info.numkeys+1;
-
-  // Get the leaf node to set it's properties
-  BTreeNode n;
-  n.Unserialize(buffercache, newNodePtr);
-  n.info.parent = ptr;
-  n.info.numkeys = 0;
-  // (probably need to set some more properties here...)
-  // Write back to disk
-  n.Serialize(buffercache, newNodePtr);
-
-  // If our node is more than 2/3 full, then that's too full. We need to split the node 
-  // in half.
-
-  // Num slots holds the max number, we define the max as 2/3 full
-  SIZE_T numslots = b.info.GetNumSlotsAsInterior();
-  SIZE_T full = floor((2/3) * (float)numslots);
-
-  // Uh-oh; it looks like it's too full...we need to split our node
-  if (b.info.numkeys >= full) {
-    
-  }
-
-
-  // We also have to update the parent by calling insert again, but this time starting at the parent node
-  // NOTE: might need to create some type of wrapper function to do this recursively
-
-
-  // WRITE ME
-  return ERROR_UNIMPL;
-}
-
-ERROR_T BTreeIndex::LookupForInsert(const SIZE_T &node, const KEY_T &key, SIZE_T &returnVal) {
-  BTreeNode b;
-  ERROR_T rc;
-  SIZE_T offset;
-  KEY_T testkey;
   SIZE_T ptr;
 
-  // Get the root node to start our search!
-  rc = b.Unserialize(buffercache,node);
+  // Get the root node
+  rc = b.Unserialize(buffercache,superblock.info.rootnode);
   // Do some extra error checking (like update does)
   if (rc!=ERROR_NOERROR) { 
     return rc;
   }
 
-  // Start the searching process, recursively moving down the tree
-  // until we find our value
-  switch (b.info.nodetype) { 
-  case BTREE_ROOT_NODE:
-  case BTREE_INTERIOR_NODE:
-    // Scan through key/ptr pairs
-    //and recurse if possible
-    for (offset=0;offset<b.info.numkeys;offset++) { 
-      rc=b.GetKey(offset,testkey);
-      if (rc) {  return rc; }
-      if (key<testkey || key==testkey) {
-        // OK, so we now have the first key that's larger
-        // so we ned to recurse on the ptr immediately previous to 
-        // this one, if it exists
-        rc=b.GetPtr(offset,ptr);
-        if (rc) { return rc; }
-        return LookupForInsert(ptr,key,returnVal);
-      }
+  // See if the root is full or not by looping through to see how many
+  // keys are present
+  for (int offset=0;offset<b.info.numkeys;offset++) { 
+    // GetKey returns an error code; if it's not an error, then
+    // keep looping through
+    if (b.GetKey(offset,testkey) != ERROR_NOERROR) {
+      break;
     }
-    // if we got here, we need to go to the next pointer, if it exists
-    if (b.info.numkeys>0) { 
-      rc=b.GetPtr(b.info.numkeys,ptr);
-      if (rc) { return rc; }
-      return LookupForInsert(ptr,key,returnVal);
-    } else {
-      // There are no keys at all on this node, so nowhere to go
-      return ERROR_NONEXISTENT;
-    }
-    break;
-  case BTREE_LEAF_NODE:
-    // We've found our leaf node, return up and do some searching
-    b.GetPtr(0, returnVal);
-    return ERROR_NOERROR;
-/*
-    // Scan through keys looking for matching value
-    for (offset=0;offset<b.info.numkeys;offset++) { 
-      rc=b.GetKey(offset,testkey);
-      if (rc) {  return rc; }
-      // This is where we find where the key should go. Not sure if it should be less than or not.
-      // It definitely shouldn't be equals though (we're looking for a *new* key).
-      // Always return the pointer to the left of where we should be inserting.
-      if (testkey>key) {
-        b.GetPtr(offset-1, returnVal);
-        return ERROR_NOERROR;
-      } else if (testkey==key) {
-        // Throw an exception if the key already exists
-        return ERROR_CONFLICT;
-      }
-    }
-    // Otherwise, there might only be one key in the node, so just return it
-    b.GetPtr(offset, returnVal);
-    return ERROR_NOERROR;
-
-    return ERROR_NONEXISTENT;*/
-    break;
-  default:
-    // We can't be looking at anything other than a root, internal, or leaf
-    return ERROR_INSANE;
-    break;
   }
+
+  // Now check to see if we're at the end or not (no more space in the root)
+  if (offset == b.info.numkeys - 1) {
+    // We have to split a node because we're full
+
+    //s = AllocateNode();  <-- Not sure what this does in the pseudocode
+
+    // We need to make a new node that'll serve as the root (stolen from above)
+    BTreeNode newrootnode(BTREE_ROOT_NODE,
+        superblock.info.keysize,
+        superblock.info.valuesize,
+        buffercache->GetBlockSize());
+    newrootnode.info.rootnode=superblock_index+1;
+    newrootnode.info.freelist=superblock_index+2;
+    newrootnode.info.numkeys=0;
+
+    // Set the root of the tree to be the new root node
+    superblock.info.rootnode = SIZE_T(&newrootnode);
+
+    // we somehow need to add the old root as a child?
+
+    buffercache->NotifyAllocateBlock(superblock_index+1);
+
+
+
+    rc=newrootnode.Serialize(buffercache,superblock_index+1);
+
+    if (rc) { 
+      return rc;
+    }
+
+  } else {
+
+  }
+
+  // WRITE ME
+  return ERROR_UNIMPL;
 }
   
 ERROR_T BTreeIndex::Update(const KEY_T &key, const VALUE_T &value)
