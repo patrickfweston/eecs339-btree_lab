@@ -22,6 +22,8 @@ TEST*
 
 /btree_lab/
 
+.DS_STORE
+
 # Object files
 *.o
 *.ko
