@@ -370,7 +370,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   // If root hasn't been set yet
   if (superblock.info.numkeys == 0) {
     cout << "Inserting root node." << endl; 
-    b.Unserialize(buffercache, ptr);
+    b.Unserialize(buffercache, superblock.info.rootnode);
     b.info.parent = 0; // NOTE: Not sure what the parent to the root node should be set to
     b.info.numkeys = 1;
     b.info.keysize = superblock.info.keysize;
@@ -392,7 +392,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     cout << "SetVal Root Call" << endl;
  
     // Write back to disk
-    b.Serialize(buffercache, ptr);
+    b.Serialize(buffercache, superblock.info.rootnode);
     cout << "Write root back to disk." << endl;
   }
 
