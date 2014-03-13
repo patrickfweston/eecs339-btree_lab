@@ -20,6 +20,8 @@ writedisk*
 __test*
 TEST*
 
+./btree_delete
+
 
 # Object files
 *.o
