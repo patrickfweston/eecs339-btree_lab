@@ -362,6 +362,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   SIZE_T offset;
   KEY_T testkey;
   
+  cout << "Hello";
 
   SIZE_T leaf;
   SIZE_T& ptr = leaf;
