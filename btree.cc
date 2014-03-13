@@ -365,6 +365,37 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
   SIZE_T leaf;
   SIZE_T& ptr = leaf;
+  
+  // If root hasn't been set yet
+  if (superblock.info.numkeys == 0) {
+    cout << "Inserting root node." << endl; 
+    b.Unserialize(buffercache, ptr);
+    b.info.parent = 0; // NOTE: Not sure what the parent to the root node should be set to
+    b.info.numkeys = 1;
+    b.info.keysize = superblock.info.keysize;
+    b.info.valuesize = superblock.info.valuesize;
+    b.info.blocksize = buffercache->GetBlockSize();
+    b.info.nodetype = BTREE_ROOT_NODE;
+    cout << "Setting info data for root." << endl;
+   
+    // NOTE: not sure if this is needed
+    //rc = b.SetKey(0, key);
+    cout << "Key: " << key << endl;
+    cout << "Value: " << value << endl;
+    cout << "b.data: " << b.data << endl;
+    //b.data = key;
+    cout << "SetKey Root Call" << endl;
+    //rc = b.SetVal(0, value);
+    //key.data = value;
+    cout << "key.data: " << key.data << endl;
+    cout << "SetVal Root Call" << endl;
+ 
+    // Write back to disk
+    b.Serialize(buffercache, ptr);
+    cout << "Write root back to disk." << endl;
+  }
+
+  else {
   // Look up where the key should be inserted. Get a pointer for it. 
   rc = LookupForInsert(superblock.info.rootnode, key, ptr);
 
@@ -478,7 +509,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     b.Serialize(buffercache, ptr);
     rightLeafNode.Serialize(buffercache, rightNodePtr);
   }
-
+  }
   return ERROR_NOERROR;
 }
 
