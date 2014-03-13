@@ -120,6 +120,9 @@ public:
   // return ERROR_NONEXISTENT  if the key doesn't exist
   ERROR_T Lookup(const KEY_T &key, VALUE_T &value);
 
+  // A special user defined function to look up for insert
+  ERROR_T LookupForInsert(const SIZE_T &node, const KEY_T &key, SIZE_T &returnVal);
+
   // Here you should figure out if your index makes sense
   // Is it a tree?  Is it in order?  Is it balanced?  Does each node have
   // a valid use ratio?

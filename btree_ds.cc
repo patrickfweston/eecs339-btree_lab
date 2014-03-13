@@ -234,7 +234,6 @@ ERROR_T BTreeNode::GetVal(const SIZE_T offset, VALUE_T &v) const
   return ERROR_NOERROR;
 }
 
-
 ERROR_T BTreeNode::GetKeyVal(const SIZE_T offset, KeyValuePair &p) const
 {
   ERROR_T rc= GetKey(offset,p.key);
@@ -273,8 +272,6 @@ ERROR_T BTreeNode::SetPtr(const SIZE_T offset, const SIZE_T &ptr)
 
   return ERROR_NOERROR;
 }
-
-
 
 ERROR_T BTreeNode::SetVal(const SIZE_T offset, const VALUE_T &v)
 {
