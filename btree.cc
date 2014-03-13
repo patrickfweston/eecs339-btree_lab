@@ -380,7 +380,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     cout << "Setting info data for root." << endl;
    
     // NOTE: not sure if this is needed
-    //rc = b.SetKey(0, key);
+    rc = b.SetKey(0, key);
     cout << "Key: " << key << endl;
     cout << "Value: " << value << endl;
     cout << "b.data: " << b.data << endl;
