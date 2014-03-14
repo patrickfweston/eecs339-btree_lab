@@ -145,10 +145,10 @@ char * BTreeNode::ResolveKey(const SIZE_T offset) const
   switch (info.nodetype) { 
   case BTREE_INTERIOR_NODE:
   case BTREE_ROOT_NODE:
-    cout << "Resolve Key Root Call" << endl;
-    cout << "info.numkeys: " << info.numkeys << endl;
-    cout << "data: " << data << endl;
-    cout << "sizeof(SIZE_T): " << sizeof(SIZE_T) << endl;
+    //cout << "Resolve Key Root Call" << endl;
+    //cout << "info.numkeys: " << info.numkeys << endl;
+    //cout << "data: " << data << endl;
+    //cout << "sizeof(SIZE_T): " << sizeof(SIZE_T) << endl;
     assert(offset<info.numkeys);
     return data+sizeof(SIZE_T)+offset*(sizeof(SIZE_T)+info.keysize);
     break;
