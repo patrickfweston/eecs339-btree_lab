@@ -358,7 +358,7 @@ ERROR_T BTreeIndex::Lookup(const KEY_T &key, VALUE_T &value)
 ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 {
   BTreeNode b;
-  BTreeNode c;
+  BTreeNode super;
   ERROR_T rc;
   SIZE_T offset;
   KEY_T testkey;
@@ -371,9 +371,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   // If root hasn't been set yet
   if (superblock.info.numkeys == 0) {
     cout << "Inserting root node." << endl; 
-
     b.Unserialize(buffercache, superblock.info.rootnode);
-    b.info.parent = 0; // NOTE: Not sure what the parent to the root node should be set to
+    b.info.parent = superblock.info.rootnode;
     b.info.numkeys++;
     b.info.nodetype = BTREE_LEAF_NODE;
     //cout << "Setting info data for root." << endl;
@@ -396,8 +395,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     b.Serialize(buffercache, superblock.info.rootnode);
     cout << "Write root back to disk." << endl;
 
-    c.Unserialize(buffercache, superblock.info.rootnode);
-    cout << c.info.numkeys << " = " << superblock.info.numkeys << endl;
+    cout << b.info.numkeys << " = " << superblock.info.numkeys << endl;
   }
   else {
     // Look up where the key should be inserted. Get a pointer for it. 
@@ -446,6 +444,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
     // Trick the assertion
     b.info.numkeys++;
+
+    cout << "numkeys: " << b.info.numkeys;
+    // NOTE: might fix Segfault
     for (SIZE_T position = b.info.numkeys-1; position >= offset; position--) {
       KEY_T tempKey;
       b.GetKey(position-1, tempKey);
@@ -526,6 +527,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       rightLeafNode.info.blocksize = buffercache->GetBlockSize();
       rightLeafNode.info.nodetype = BTREE_LEAF_NODE;
 
+      cout << "Right creation" << endl;
       for (int i = numkeysLeft; i < b.info.numkeys; i++) {
         KEY_T tempKey;
         b.GetKey(i, tempKey);
@@ -536,8 +538,45 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         rightLeafNode.SetVal(i-numkeysLeft, tempVal);
       }
 
+      cout << "Past loop" << endl;
       // Update the left node's number of keys
       b.info.numkeys = numkeysLeft;
+
+      cout << "b.info.numkeys" << b.info.numkeys << endl;
+
+      if (b.info.parent == superblock.info.rootnode) {
+        // Need to create a new root node
+        BTreeNode newRoot;
+        SIZE_T newRootSizeT;
+        SIZE_T& newRootPtr = newRootSizeT;
+        rc = AllocateNode(rightNodePtr);
+
+        newRoot.Unserialize(buffercache, newRootPtr);
+
+        cout << "Unserialize" << endl;
+
+        superblock.info.rootnode = newRootPtr; // NOTE: might be the newRootSizeT
+        newRoot.info.freelist = superblock.info.freelist;
+        newRoot.info.nodetype = BTREE_ROOT_NODE;
+        newRoot.info.numkeys = 2;
+        newRoot.info.keysize = superblock.info.keysize;
+        newRoot.info.valuesize = superblock.info.valuesize;
+        newRoot.info.blocksize = buffercache->GetBlockSize();
+        newRoot.info.parent = superblock.info.rootnode;
+
+        cout << "set properties" << endl;
+        
+        KEY_T middle;
+        rightLeafNode.GetKey(0, middle);
+        newRoot.SetKey(0, middle);
+
+        cout << "Middle: " << middle;
+
+        newRoot.SetPtr(0, ptr);
+        newRoot.SetPtr(1, rightNodePtr);
+
+        newRoot.Serialize(buffercache, newRootPtr);
+      }
 
       //b.Serialize(buffercache, ptr);
       rightLeafNode.Serialize(buffercache, rightNodePtr);
