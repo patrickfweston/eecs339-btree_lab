@@ -445,9 +445,10 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     // Trick the assertion
     b.info.numkeys++;
 
-    cout << "numkeys: " << b.info.numkeys;
-    // NOTE: might fix Segfault
-    for (SIZE_T position = b.info.numkeys-1; position >= offset; position--) {
+    //cout << "numkeys: " << b.info.numkeys << endl;
+    for (SIZE_T position = b.info.numkeys-1; position > offset; position--) {
+      //cout << "Position: " << position << endl;
+     
       KEY_T tempKey;
       b.GetKey(position-1, tempKey);
       b.SetKey(position, tempKey);
@@ -461,7 +462,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     b.SetKey(offset, key);
     b.SetVal(offset, value);
 
-    cout << "passed it? " << endl;
+    //cout << "passed it? " << endl;
     // NOTE: Where should be set the parent pointer?
 
   /*  // Now that we've moved everything to the right, insert at the hole that is at offset+1
@@ -515,7 +516,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       SIZE_T rightNode;
       SIZE_T& rightNodePtr = rightNode;
       rc = AllocateNode(rightNodePtr);
-
+      
       BTreeNode rightLeafNode;
       // NOTE: this might need to be rightLeafNode
       rightLeafNode.Unserialize(buffercache, rightNodePtr);
@@ -526,15 +527,22 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       rightLeafNode.info.valuesize = superblock.info.valuesize;
       rightLeafNode.info.blocksize = buffercache->GetBlockSize();
       rightLeafNode.info.nodetype = BTREE_LEAF_NODE;
+      cout << "rightLeafNode.info" << rightLeafNode.info << endl;
 
       cout << "Right creation" << endl;
+      cout << "numkeysLeft: " << numkeysLeft << endl;
+      cout << "b.info.numkeys: " << b.info.numkeys << endl;
       for (int i = numkeysLeft; i < b.info.numkeys; i++) {
         KEY_T tempKey;
         b.GetKey(i, tempKey);
+        cout << "i: " << i << endl;
+        cout << "tempKey: " << tempKey << endl;
         rightLeafNode.SetKey(i-numkeysLeft, tempKey);
-
+    
+        cout << "Did I pass? " << endl;
         VALUE_T tempVal;
         b.GetVal(i, tempVal);
+        cout << "tempVal: " << tempVal << endl;
         rightLeafNode.SetVal(i-numkeysLeft, tempVal);
       }
 
