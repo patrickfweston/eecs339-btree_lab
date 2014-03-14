@@ -477,8 +477,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
       rightLeafNode.info.parent = b.info.parent;
       rightLeafNode.info.numkeys = numkeysRight;
-      rightLeafNode.info.nodetype = BTREE_LEAF_NODE;
 
+      // Copy over the keys
       for (int i = numkeysLeft; i < b.info.numkeys; i++) {
         cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
 
@@ -497,6 +497,93 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       cout << endl << endl;
       cout << "b.info.parent " << b.info.parent << endl;
       cout << "superblock.info.rootnode (before) " << superblock.info.rootnode << endl;
+
+
+
+
+
+
+
+      // TODO: We need to see if we have space in the parent for the newly created right node. If we do, awesome. If not, we have to split again. Also, there's the special case if we're at the root. When that's the case, we need to create a new root node and update appropriate pointers. (note: a lot of the code for) this loop can be copied from below to handle more general cases. */
+      do {
+        SIZE_T& parentPtr = b.info.parent;
+        BTreeNode parent;
+        parent.Unserialize(buffercache, parentPtr);
+
+        SIZE_T numslots = parent.info.GetNumSlotsAsInterior();
+        SIZE_T full = floor((2.0/3.0) * (float)numslots);
+        cout << "INTERIOR:" << endl << "numslots: " << numslots << "full: " << full << endl;
+
+        // Find the value we need to be inserting
+        KEY_T middle;
+        rightLeafNode.GetKey(0, middle);
+
+        // Let's search where to insert our key into the interior node
+        SIZE_T insertionPoint;
+        for (insertionPoint=0;insertionPoint<parent.info.numkeys;insertionPoint++) { 
+          // Get the key value
+          rc=parent.GetKey(insertionPoint,testkey);
+          // Do standard error checking
+          if (rc) {  return rc; }
+          // If we find something
+          if(middle<testkey) {
+            // then break out of the loop
+            break;
+          }
+        }
+
+        // Make room for our new key by sorting and shifting to the right
+        for (SIZE_T position = parent.info.numkeys-1; position > offset; position--) {
+          SIZE_T tempPtr;
+          parent.GetPtr(position-1, tempPtr);
+          parent.SetPtr(position, tempPtr);
+
+          KEY_T tempKey;
+          parent.GetKey(position-1, tempKey);
+          parent.SetKey(position, tempKey);
+        }
+
+        // Now insert our new node and increment the number of keys the parent has
+        // TODO: I think this should be the right node and not the left.
+        parent.SetPtr(offset, rightNodePtr);
+        parent.SetKey(offset, middle);
+
+        // Check to see if the parent is more full than allowed
+        if(parent.info.numkeys >= full) {
+          // Since it's too full, we need to split it.
+          SIZE_T numkeysLeft = floor((1.0/2.0) * parent.info.numkeys);
+          SIZE_T numkeysRight = parent.info.numkeys - numkeysLeft;
+
+          // Create a new parent interior node
+          SIZE_T newParentRight;
+          SIZE_T& newParentRightPtr = newParentRight;
+          BTreeNode newParent(BTREE_INTERIOR_NODE,
+            superblock.info.keysize,
+            superblock.info.valuesize,
+            buffercache->GetBlockSize());
+          
+          rc = AllocateNode(newParentRight);
+          if (rc!=ERROR_NOERROR) {return rc;}
+
+          // Update the parameters
+          newParent.info.parent = parent.info.parent;
+          newParent.info.numkeys = numkeysRight;
+
+          // PW: Stopped here for my meeting
+          // Copy over the keys
+        }
+
+        parent.Serialize(buffercache, parentPtr);
+      } while (b.info.parent != superblock.info.rootnode);
+
+
+
+
+
+
+
+
+
 
       if (b.info.parent == superblock.info.rootnode) {
         // Need to create a new root node
