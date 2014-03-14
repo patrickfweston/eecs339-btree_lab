@@ -362,7 +362,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   SIZE_T offset;
   KEY_T testkey;
   
-  cout << "Hello";
+  //cout << "Hello";
 
   SIZE_T leaf;
   SIZE_T& ptr = leaf;
@@ -373,23 +373,24 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     b.Unserialize(buffercache, superblock.info.rootnode);
     b.info.parent = 0; // NOTE: Not sure what the parent to the root node should be set to
     b.info.numkeys = 1;
+    superblock.info.numkeys = 1;
     b.info.keysize = superblock.info.keysize;
     b.info.valuesize = superblock.info.valuesize;
     b.info.blocksize = buffercache->GetBlockSize();
     b.info.nodetype = BTREE_ROOT_NODE;
-    cout << "Setting info data for root." << endl;
-   
+    //cout << "Setting info data for root." << endl;
+    //cout << "Number of slots: " << b.info.GetNumSlotsAsLeaf() << endl;
     // NOTE: not sure if this is needed
     rc = b.SetKey(0, key);
-    cout << "Key: " << key << endl;
-    cout << "Value: " << value << endl;
-    cout << "b.data: " << b.data << endl;
+    //cout << "Key: " << key << endl;
+    //cout << "Value: " << value << endl;
+    //cout << "b.data: " << b.data << endl;
     //b.data = key;
-    cout << "SetKey Root Call" << endl;
-    //rc = b.SetVal(0, value);
+    //cout << "SetKey Root Call" << endl;
+    rc = b.SetVal(0, value);
     //key.data = value;
-    cout << "key.data: " << key.data << endl;
-    cout << "SetVal Root Call" << endl;
+    //cout << "key.data: " << key.data << endl;
+    //cout << "SetVal Root Call" << endl;
  
     // Write back to disk
     b.Serialize(buffercache, superblock.info.rootnode);
@@ -626,7 +627,7 @@ ERROR_T BTreeIndex::DisplayInternal(const SIZE_T &node,
   case BTREE_ROOT_NODE:
   case BTREE_INTERIOR_NODE:
     if (b.info.numkeys>0) { 
-      for (offset=0;offset<=b.info.numkeys;offset++) { 
+      for (offset=0;offset<b.info.numkeys;offset++) { 
 	rc=b.GetPtr(offset,ptr);
 	if (rc) { return rc; }
 	if (display_type==BTREE_DEPTH_DOT) { 
@@ -678,6 +679,7 @@ ERROR_T BTreeIndex::SanityCheck() const
 ostream & BTreeIndex::Print(ostream &os) const
 {
   // WRITE ME
+  Display(os, BTREE_DEPTH_DOT); 
   return os;
 }
 
