@@ -368,29 +368,54 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
   
   // If root hasn't been set yet
   if (superblock.info.numkeys == 0) {
-    cout << "Inserting root node." << endl; 
-    b.Unserialize(buffercache, superblock.info.rootnode);
-    b.info.parent = superblock.info.rootnode;
-    b.info.numkeys++;
+    cout << "Inserting root node." << endl;
+    SIZE_T newRootSizeT;
+    SIZE_T& newRootPtr = newRootSizeT;
+    rc = AllocateNode(newRootPtr);    
+    BTreeNode newRoot(BTREE_ROOT_NODE, superblock.info.keysize, superblock.info.valuesize, buffercache->GetBlockSize());
+ 
+    // Update the superblock's rootnode pointer
+    superblock.info.rootnode = newRootPtr; // NOTE: might be the newRootSizeT
+    
+    // Setup our new root node
+    newRoot.info.parent = superblock.info.rootnode;
+    newRoot.info.freelist = superblock.info.freelist;
+    newRoot.info.numkeys = 1;
+    rc = newRoot.SetKey(0, key);
+    rc = AllocateNode(ptr);
+    //b.Unserialize(buffercache, ptr);
+    b.info.parent = newRootPtr;
+    b.info.numkeys = 1;
     b.info.nodetype = BTREE_LEAF_NODE;
-    //cout << "Setting info data for root." << endl;
+    b.info.keysize = superblock.info.keysize;
+    b.info.valuesize = superblock.info.valuesize;
+    b.info.blocksize = buffercache->GetBlockSize();    
+
+    cout << "Setting info data for root." << endl;
     //cout << "Number of slots: " << b.info.GetNumSlotsAsLeaf() << endl;
     // NOTE: not sure if this is needed
     rc = b.SetKey(0, key);
+    if (rc) {return rc;}
     //cout << "Key: " << key << endl;
     //cout << "Value: " << value << endl;
     //cout << "b.data: " << b.data << endl;
     //b.data = key;
-    //cout << "SetKey Root Call" << endl;
+    cout << "SetKey Root Call" << endl;
     rc = b.SetVal(0, value);
+    if (rc) {return rc;}
+    
     //key.data = value;
     //cout << "key.data: " << key.data << endl;
-    //cout << "SetVal Root Call" << endl;
+    cout << "SetVal Root Call" << endl;
  
-    superblock.info.numkeys++;
+    //superblock.info.numkeys++;
+    newRoot.SetPtr(0, ptr);
+    cout << "SetPtr Root Call" << endl;
 
     // Write back to disk
-    b.Serialize(buffercache, superblock.info.rootnode);
+    b.Serialize(buffercache, ptr);
+    cout << "Serialize leaf" << endl;
+    newRoot.Serialize(buffercache, newRootPtr);
     cout << "Write root back to disk." << endl;
 
     cout << b.info.numkeys << " = " << superblock.info.numkeys << endl;
@@ -510,13 +535,18 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         BTreeNode parent;
         parent.Unserialize(buffercache, parentPtr);
 
+        if (superblock.info.rootnode == parentPtr) {
+          parent.info.nodetype = 2;
+        }
+
         SIZE_T numslots = parent.info.GetNumSlotsAsInterior();
         SIZE_T full = floor((2.0/3.0) * (float)numslots);
-        cout << "INTERIOR:" << endl << "numslots: " << numslots << "full: " << full << endl;
+        cout << "INTERIOR:" << endl << "\tnumslots: " << numslots << "\tfull: " << full << endl;
 
         // Find the value we need to be inserting
         KEY_T middle;
         rightLeafNode.GetKey(0, middle);
+        cout << "middle: " << middle << endl;
 
         // Let's search where to insert our key into the interior node
         SIZE_T insertionPoint;
@@ -531,22 +561,32 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             break;
           }
         }
-
+        cout << "Insertion point: " << insertionPoint << endl;
+        cout << "parent.info.numkeys-1: " << parent.info.numkeys-1 << endl;  
         // Make room for our new key by sorting and shifting to the right
         for (SIZE_T position = parent.info.numkeys-1; position > offset; position--) {
+          cout << "position: " << position << endl;
           SIZE_T tempPtr;
           parent.GetPtr(position-1, tempPtr);
+          cout << "tempPtr: " << tempPtr << endl;
           parent.SetPtr(position, tempPtr);
+
+          cout << "Did i pass?" << endl;
 
           KEY_T tempKey;
           parent.GetKey(position-1, tempKey);
+          cout << "tempKey: " << tempKey << endl;
           parent.SetKey(position, tempKey);
+          cout << "Did i pass here? " << endl;
         }
-
+	cout << "mebbe? " << endl;
         // Now insert our new node and increment the number of keys the parent has
         // TODO: I think this should be the right node and not the left.
+        cout << "offset: " << offset << endl << "Parent node type: " << parent.info.nodetype << endl;
         parent.SetPtr(offset, rightNodePtr);
+        cout << "passed setPtr" << endl;
         parent.SetKey(offset, middle);
+        cout << "passed setKey" << endl;
 
         // Check to see if the parent is more full than allowed
         if(parent.info.numkeys >= full) {
