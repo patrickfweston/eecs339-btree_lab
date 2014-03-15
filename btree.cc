@@ -1350,8 +1350,9 @@ ERROR_T BTreeIndex::SanityCheck() const
 // - the key count in the superblock is the same as the actual number of keys in the tree's leaf nodes.
 
   ERROR_T rc;
-  SIZE_T numberOfKeys;
-  rc = checkNodes(superblock.info.rootnode, SIZE_T &numberOfKeys);
+  SIZE_T numberOfKeysVar;
+  SIZE_T &numberOfKeys = numberOfKeysVar;
+  rc = checkNodes(superblock.info.rootnode, numberOfKeys);
   if(rc){
     return rc;
   }
