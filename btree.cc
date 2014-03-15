@@ -589,13 +589,15 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
               // Make room for our new key by sorting and shifting to the right
               for (SIZE_T position = parent.info.numkeys-1; position > insertionPoint; position--) {
-                SIZE_T tempPtr;
-                parent.GetPtr(position-1, tempPtr);
-                parent.SetPtr(position, tempPtr);
-
                 KEY_T tempKey;
                 parent.GetKey(position-1, tempKey);
                 parent.SetKey(position, tempKey);
+              }
+
+              for (SIZE_T position = parent.info.numkeys; position > insertionPoint; position--) {
+                SIZE_T tempPtr;
+                parent.GetPtr(position-1, tempPtr);
+                parent.SetPtr(position, tempPtr);
               }
 
               cout << "Right interior: " << rightInterior << endl;
