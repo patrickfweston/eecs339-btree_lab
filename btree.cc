@@ -528,7 +528,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               rc = AllocateNode(newRootPtr);
 
               // Update the superblock's rootnode pointer
-              superblock.info.rootnode = newRootPtr; // NOTE: might be the newRootSizeT
+              superblock.info.rootnode = newRootPtr;
               cout << "superblock.info.rootnode (after) " << superblock.info.rootnode << endl;
               cout << "Inserting into new node: " << newRootPtr << endl;
 
@@ -543,6 +543,12 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               newRoot.SetKey(0, middle);
 
               cout << "Middle: " << middle << endl;
+
+              // TODO: I'm pretty sure we still need to fill in our key that causes
+              // it to "overflow". Then we need to sort the current root and split
+              // it up into two new ones. I'll work on this tomorrow morning when I
+              // get the chance. I think it should be pretty easy. - PW
+
 
               // Update our root's pointers
               newRoot.SetPtr(0, ptr);
