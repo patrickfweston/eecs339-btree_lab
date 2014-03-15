@@ -661,7 +661,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               cout << "Left child: " << ptr << " Right child: " << rightInterior << endl;
               newRoot.Serialize(buffercache, newRootSizeT);
             } 
-            // If the parent isn't full, just shift over the keys like normal
+            // If the root isn't full, just shift over the keys like normal
             else {
               cout << "---------- CASE: Root is NOT full ----------" << endl;
               // Find the value we need to be inserting into the parent node
@@ -718,7 +718,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         // If we're just dealing with an interior node, then move the keys over
         else {
           cout << "---------- CASE: Interior node ----------" << endl;
-          cout << "INTERIOR:" << endl << "numslots: " << numslots << "full: " << full << endl;
+          cout << "INTERIOR:" << endl << "numslots: " << numslots << " full: " << full << endl;
+          cout << "Current node: " << rightNode << endl;
+          cout << "Node's parent: " << parentPtr << endl;
 
           // Find the value we need to be inserting into the parent node
           KEY_T middle;
@@ -728,6 +730,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
           // Increment the number of keys the parent is going to have
           parent.info.numkeys++;
+
+          cout << "Number parent keys: " << parent.info.numkeys << endl;
 
           // Let's search where to insert our key into the interior node
           SIZE_T insertionPoint;
@@ -743,24 +747,36 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             }
           }
 
-          cout << "parentPtr: " << parentPtr << endl;
-          cout << "parent node type: " << parent.info.nodetype << endl;
+          //cout << "parentPtr: " << parentPtr << endl;
+          //cout << "parent node type: " << parent.info.nodetype << endl;
 
-          // Make room for our new key by sorting and shifting to the right
-          for (SIZE_T position = parent.info.numkeys-1; position > offset; position--) {
-            SIZE_T tempPtr;
-            parent.GetPtr(position-1, tempPtr);
-            parent.SetPtr(position, tempPtr);
+          //cout << "Key Position: " << parent.info.numkeys-1 << endl;
+          //cout << "Insertion point: " << insertionPoint << endl;
 
+          // Make room by shifting the ptrs
+          for (SIZE_T position = parent.info.numkeys-1; position > insertionPoint; position--) {
             KEY_T tempKey;
             parent.GetKey(position-1, tempKey);
             parent.SetKey(position, tempKey);
           }
 
+          //cout << "Ptr Position: " << parent.info.numkeys << endl;
+          //cout << "Insertion point: " << insertionPoint << endl;
+
+          // Make room for our new key by sorting and shifting to the right
+          for (SIZE_T position = parent.info.numkeys; position > insertionPoint; position--) {
+            SIZE_T tempPtr;
+            parent.GetPtr(position-1, tempPtr);
+            parent.SetPtr(position, tempPtr);
+          }
+
+          cout << "Setting the keys and ptr" << endl;
           // Now insert our new node and increment the number of keys the parent has
           // TODO: I think this should be the right node and not the left.
-          parent.SetPtr(offset, rightNode);
-          parent.SetKey(offset, middle);
+          parent.SetPtr(insertionPoint, rightNode);
+          parent.SetKey(insertionPoint-1, middle);
+
+          cout << "parent's num keys " << parent.info.numkeys << " full: " << full << endl;
 
           // Check to see if the parent is more full than allowed. Split if needed
           if(parent.info.numkeys >= full) {
@@ -791,7 +807,12 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               KEY_T tempKey;
               parent.GetKey(i, tempKey);
               newParent.SetKey(i-numkeysLeft, tempKey);
-          
+            }
+
+            // Copy over the pointers
+            for (int i = numkeysLeft; i < newParent.info.numkeys; i++) {
+              cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
+              
               SIZE_T tempPtr;
               parent.GetPtr(i, tempPtr);
               newParent.SetPtr(i-numkeysLeft, tempPtr);
@@ -809,6 +830,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
             // Also update the loop's right child node
             rightInterior = newParentRightPtr;
+          } else {
+            notRootNode = false;
           }
         }
 
@@ -816,8 +839,30 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         right.Serialize(buffercache, rightNode);
       } while (notRootNode);
 
+      // Get the left pointer's parent by moving up to the right and seeing where it points to
       BTreeNode oldRight;
       oldRight.Unserialize(buffercache, rightNode);
+
+      // SIZE_T RightsParent = oldRight.info.parent;
+      // BTreeNode rightsParentB;
+      // rightsParentB.Unserialize(buffercache, RightsParent);
+
+      // SIZE_T RightsParentsParent = rightsParentB.info.parent;
+      // BTreeNode RPP;
+      // RPP.Unserialize(buffercache, RightsParentsParent);
+
+      // key = 
+
+      // for (offset=0;offset<RPP.info.numkeys;offset++) { 
+      //   rc=b.GetKey(offset,testkey);
+      //   if (rc) {  return rc; }
+      //   if (key>testkey) {
+      //     break;
+      //   }
+      // }
+      // SIZE_T temp;
+      // RPP.GetPtr(offset, temp);
+      // b.info.parent = temp;
       b.info.parent = oldRight.info.parent;
       oldRight.Serialize(buffercache, rightNode);
     }
