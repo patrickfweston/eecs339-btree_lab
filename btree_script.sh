@@ -39,5 +39,5 @@ clear
 ./btree_insert mydisk 64 aal 19
 ./btree_insert mydisk 64 acj 12
 ./btree_insert mydisk 64 ack 19
-#./btree_insert mydisk 64 acl 19
+./btree_insert mydisk 64 acl 19
 ./btree_display mydisk 64 normal

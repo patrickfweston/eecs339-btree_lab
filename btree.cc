@@ -522,6 +522,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             // new root for the tree
             if (SuperRoot.info.numkeys+1 >= rootFull) {
               cout << "---------- CASE: Root is full ----------" << endl;
+              cout << "Num keys: " << SuperRoot.info.numkeys << " root full: " << rootFull << endl;
               cout << "Super root node type" << SuperRoot.info.nodetype << endl;
 
               // Need to create a new root node
@@ -557,10 +558,6 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 // it to "overflow". Then we need to sort the current root and split
                 // it up into two new ones. I'll work on this tomorrow morning when I
                 // get the chance. I think it should be pretty easy. - PW
-                
-                // Get how many keys will be in the left and how many will be on the right
-                SIZE_T rootKeysLeft = floor((1.0/2.0) * parent.info.numkeys);
-                SIZE_T rootKeysRight = parent.info.numkeys - rootKeysLeft;
 
                 // Allocate a new right interior node for the root
                 SIZE_T newRootRightChild;
@@ -573,19 +570,67 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 rc = AllocateNode(newRootRightChildPtr);
                 if (rc!=ERROR_NOERROR) {return rc;}
 
+                cout << "New root right child ptr: " << newRootRightChildPtr << endl;
+                cout << "Parent ptr: " << parentPtr << endl;
+
+                // Let's search where to insert our key into the interior node
+                SIZE_T insertionPoint;
+                for (insertionPoint=0;insertionPoint<parent.info.numkeys;insertionPoint++) { 
+                  // Get the key value
+                  rc=parent.GetKey(insertionPoint,testkey);
+                  // Do standard error checking
+                  if (rc) {  return rc; }
+                  // If we find something
+                  if(middle<testkey) {
+                    // then break out of the loop
+                    break;
+                  }
+                }
+
+                // Increment the number of keys the parent is going to have
+                parent.info.numkeys++;
+
+                // Get how many keys will be in the left and how many will be on the right
+                SIZE_T rootKeysLeft = floor((1.0/2.0) * parent.info.numkeys);
+                SIZE_T rootKeysRight = parent.info.numkeys - rootKeysLeft;
+
+                cout << "Left keys: " << rootKeysLeft << " Right keys: " << rootKeysRight << endl;
+                cout << "Insertion point: " << insertionPoint << endl;
+
+                // Make room for our new key by sorting and shifting to the right
+                for (SIZE_T position = parent.info.numkeys-1; position > insertionPoint; position--) {
+                  KEY_T tempKey;
+                  parent.GetKey(position-1, tempKey);
+                  parent.SetKey(position, tempKey);
+                }
+
+                for (SIZE_T position = parent.info.numkeys; position > insertionPoint; position--) {
+                  SIZE_T tempPtr;
+                  parent.GetPtr(position-1, tempPtr);
+                  parent.SetPtr(position, tempPtr);
+                }
+                parent.SetKey(insertionPoint, middle);
+                parent.SetPtr(insertionPoint+1, rightNode);
+
+
                 // Set it's parent to be the new root; update the number of keys
                 newRootRight.info.parent = newRootPtr;
-                newRootRight.info.numkeys = rootKeysRight;
+                newRootRight.info.numkeys = rootKeysRight-1;
 
                 // Copy over the keys
-                for (int i = rootKeysLeft; i<newRootRight.info.numkeys; i++) {
+                for (int i = rootKeysLeft+1; i < parent.info.numkeys; i++) {
+                  cout << "Transferring key: " << i << endl;
                   KEY_T tempKey;
                   parent.GetKey(i, tempKey);
-                  newRootRight.SetKey(i-rootKeysLeft, tempKey);
+                  newRootRight.SetKey(i-rootKeysLeft-1, tempKey);
+                }
 
+                // Copy over ptrs
+                for (int i = rootKeysLeft; i < parent.info.numkeys; i++) {
+                  cout << "Transferring ptr: " << i << endl;
                   SIZE_T tempPtr;
-                  parent.GetPtr(i, tempPtr);
-                  newRootRight.SetKey(i-rootKeysLeft, tempPtr);
+                  parent.GetPtr(i+1, tempPtr);
+                  newRootRight.SetPtr(i-rootKeysLeft, tempPtr);
                 }
 
                 // Update the parent's number of keys
@@ -593,6 +638,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
                 // Make sure the left and right child both point to the new root
                 parent.info.parent = newRootPtr;
+
+                // Update the right leaf node's parent pointer
+                right.info.parent = parentPtr;
 
                 newRoot.SetPtr(0, parentPtr);
                 newRoot.SetPtr(1, newRootRightChildPtr);
@@ -602,16 +650,16 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 // Update our root's pointers
                 newRoot.SetPtr(0, parentPtr);
                 newRoot.SetPtr(1, rightNode);
+
+                // Update our split nodes' parents to be the new root
+                parent.info.parent = superblock.info.rootnode;
+                right.info.parent = superblock.info.rootnode;
+
+                cout << "RIGHT: " << rightInterior << " parent: " << right.info.parent << endl;
               }
 
               cout << "Left child: " << ptr << " Right child: " << rightInterior << endl;
               newRoot.Serialize(buffercache, newRootSizeT);
-
-              // Update our split nodes' parents to be the new root
-              parent.info.parent = superblock.info.rootnode;
-              right.info.parent = superblock.info.rootnode;
-
-              cout << "RIGHT: " << rightInterior << " parent: " << right.info.parent << endl;
             } 
             // If the parent isn't full, just shift over the keys like normal
             else {
@@ -904,7 +952,7 @@ ERROR_T BTreeIndex::DisplayInternal(const SIZE_T &node,
         BTreeNode test;
         test.Unserialize(buffercache, ptr);
         // TODO: REMOVE FOR ACTUAL TESTING
-        o << "parent: " << test.info.parent << " ";
+        o << "parent: " << test.info.parent << "     ";
         if (rc) { return rc; }
         if (display_type==BTREE_DEPTH_DOT) {
           o << node << " -> "<<ptr<<";\n";
