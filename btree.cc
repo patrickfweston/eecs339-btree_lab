@@ -542,8 +542,10 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             newRoot.Serialize(buffercache, newRootSizeT);
 
             // Update our split nodes' parents to be the new root
-            parent.info.parent = superblock.info.parent;
-            right.info.parent = superblock.info.parent;
+            parent.info.parent = superblock.info.rootnode;
+            right.info.parent = superblock.info.rootnode;
+
+            cout << "RIGHT: " << rightInterior << " parent: " << right.info.parent << endl;
         } else {
           SIZE_T numslots = parent.info.GetNumSlotsAsInterior();
           SIZE_T full = floor((2.0/3.0) * (float)numslots);
@@ -552,6 +554,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
           // Find the value we need to be inserting into the parent node
           KEY_T middle;
           right.GetKey(0, middle);
+
+          cout << "Middle " << middle << endl;
 
           // Increment the number of keys the parent is going to have
           parent.info.numkeys++;
@@ -569,6 +573,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               break;
             }
           }
+
+          cout << "parentPtr: " << parentPtr << endl;
+          cout << "parent node type: " << parent.info.nodetype << endl;
 
           // Make room for our new key by sorting and shifting to the right
           for (SIZE_T position = parent.info.numkeys-1; position > offset; position--) {
@@ -622,6 +629,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
             // Update the size of the old parent
             parent.info.numkeys = numkeysLeft;
+
+            right.info.parent = newParentRight;
+
             newParent.Serialize(buffercache, newParentRight);
 
             // Update the loop's parent pointer to the next level up
@@ -636,9 +646,12 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         right.Serialize(buffercache, rightNode);
       } while (notRootNode);
 
-      // Serialize our new right node
-      rightLeafNode.Serialize(buffercache, rightNode);
+      BTreeNode oldRight;
+      oldRight.Unserialize(buffercache, rightNode);
+      b.info.parent = oldRight.info.parent;
+      oldRight.Serialize(buffercache, rightNode);
     }
+
     // And finally, serialize our existing left node
     b.Serialize(buffercache, ptr);
   }
@@ -766,6 +779,10 @@ ERROR_T BTreeIndex::DisplayInternal(const SIZE_T &node,
     if (b.info.numkeys>0) { 
       for (offset=0;offset<=b.info.numkeys;offset++) { 
         rc=b.GetPtr(offset,ptr);
+        BTreeNode test;
+        test.Unserialize(buffercache, ptr);
+        // TODO: REMOVE FOR ACTUAL TESTING
+        o << "parent: " << test.info.parent << " ";
         if (rc) { return rc; }
         if (display_type==BTREE_DEPTH_DOT) {
           o << node << " -> "<<ptr<<";\n";
