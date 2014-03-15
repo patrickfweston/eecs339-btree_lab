@@ -510,13 +510,19 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         SIZE_T rootFull = floor((2.0/3.0) * (float)parent.info.GetNumSlotsAsLeaf());
         SIZE_T full = floor((2.0/3.0) * (float)numslots);
 
+        // See if we're dealing with the root node (it has special conditions)
         if (parentPtr == superblock.info.rootnode) {
             notRootNode = false;
 
             BTreeNode SuperRoot;
             SuperRoot.Unserialize(buffercache, superblock.info.rootnode);
             cout << "Full capacity: " << rootFull << " Num keys: " << SuperRoot.info.numkeys << endl;
+
+            // Also see if the root is full or not. If it is we need to split and also create a 
+            // new root for the tree
             if (SuperRoot.info.numkeys+1 >= rootFull) {
+              cout << "---------- CASE: Root is full ----------" << endl;
+              cout << "Super root node type" << SuperRoot.info.nodetype << endl;
 
               // Need to create a new root node
               BTreeNode newRoot(BTREE_ROOT_NODE,
@@ -544,15 +550,59 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
               cout << "Middle: " << middle << endl;
 
-              // TODO: I'm pretty sure we still need to fill in our key that causes
-              // it to "overflow". Then we need to sort the current root and split
-              // it up into two new ones. I'll work on this tomorrow morning when I
-              // get the chance. I think it should be pretty easy. - PW
+              // Check to see if the root node is actually acting like a root node
+              // and not a leaf (aka skip the first case where it is a leaf)
+              if (SuperRoot.info.nodetype == BTREE_ROOT_NODE) {
+                // TODO: I'm pretty sure we still need to fill in our key that causes
+                // it to "overflow". Then we need to sort the current root and split
+                // it up into two new ones. I'll work on this tomorrow morning when I
+                // get the chance. I think it should be pretty easy. - PW
+                
+                // Get how many keys will be in the left and how many will be on the right
+                SIZE_T rootKeysLeft = floor((1.0/2.0) * parent.info.numkeys);
+                SIZE_T rootKeysRight = parent.info.numkeys - rootKeysLeft;
 
+                // Allocate a new right interior node for the root
+                SIZE_T newRootRightChild;
+                SIZE_T& newRootRightChildPtr = newRootRightChild;
+                BTreeNode newRootRight(BTREE_INTERIOR_NODE,
+                  superblock.info.keysize,
+                  superblock.info.valuesize,
+                  buffercache->GetBlockSize());
 
-              // Update our root's pointers
-              newRoot.SetPtr(0, ptr);
-              newRoot.SetPtr(1, rightInterior);
+                rc = AllocateNode(newRootRightChildPtr);
+                if (rc!=ERROR_NOERROR) {return rc;}
+
+                // Set it's parent to be the new root; update the number of keys
+                newRootRight.info.parent = newRootPtr;
+                newRootRight.info.numkeys = rootKeysRight;
+
+                // Copy over the keys
+                for (int i = rootKeysLeft; i<newRootRight.info.numkeys; i++) {
+                  KEY_T tempKey;
+                  parent.GetKey(i, tempKey);
+                  newRootRight.SetKey(i-rootKeysLeft, tempKey);
+
+                  SIZE_T tempPtr;
+                  parent.GetPtr(i, tempPtr);
+                  newRootRight.SetKey(i-rootKeysLeft, tempPtr);
+                }
+
+                // Update the parent's number of keys
+                parent.info.numkeys = rootKeysLeft;
+
+                // Make sure the left and right child both point to the new root
+                parent.info.parent = newRootPtr;
+
+                newRoot.SetPtr(0, parentPtr);
+                newRoot.SetPtr(1, newRootRightChildPtr);
+
+                newRootRight.Serialize(buffercache, newRootRightChildPtr);
+              } else {
+                // Update our root's pointers
+                newRoot.SetPtr(0, parentPtr);
+                newRoot.SetPtr(1, rightNode);
+              }
 
               cout << "Left child: " << ptr << " Right child: " << rightInterior << endl;
               newRoot.Serialize(buffercache, newRootSizeT);
@@ -562,7 +612,10 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               right.info.parent = superblock.info.rootnode;
 
               cout << "RIGHT: " << rightInterior << " parent: " << right.info.parent << endl;
-            } else {
+            } 
+            // If the parent isn't full, just shift over the keys like normal
+            else {
+              cout << "---------- CASE: Root is NOT full ----------" << endl;
               // Find the value we need to be inserting into the parent node
               KEY_T middle;
               right.GetKey(0, middle);
@@ -613,7 +666,10 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               parent.SetPtr(insertionPoint+1, rightInterior);
               parent.SetKey(insertionPoint, middle);
             }
-        } else {
+        } 
+        // If we're just dealing with an interior node, then move the keys over
+        else {
+          cout << "---------- CASE: Interior node ----------" << endl;
           cout << "INTERIOR:" << endl << "numslots: " << numslots << "full: " << full << endl;
 
           // Find the value we need to be inserting into the parent node
@@ -658,8 +714,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
           parent.SetPtr(offset, rightNode);
           parent.SetKey(offset, middle);
 
-          // Check to see if the parent is more full than allowed
+          // Check to see if the parent is more full than allowed. Split if needed
           if(parent.info.numkeys >= full) {
+            cout << "---------- (Interior is full) ----------" << endl;
             // Since it's too full, we need to split it.
             SIZE_T numkeysLeft = floor((1.0/2.0) * parent.info.numkeys);
             SIZE_T numkeysRight = parent.info.numkeys - numkeysLeft;
