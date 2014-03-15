@@ -1257,7 +1257,7 @@ ERROR_T BTreeIndex::Delete(const KEY_T &key)
 ERROR_T BTreeIndex::DisplayInternal(const SIZE_T &node,
 				    ostream &o,
 				    BTreeDisplayType display_type) const
-{
+{ 
   KEY_T testkey;
   SIZE_T ptr;
   BTreeNode b;
@@ -1270,6 +1270,7 @@ ERROR_T BTreeIndex::DisplayInternal(const SIZE_T &node,
     return rc;
   }
 
+//{HERE}
   rc = PrintNode(o,node,b,display_type);
   
   if (rc) { return rc; }
@@ -1334,7 +1335,96 @@ ERROR_T BTreeIndex::Display(ostream &o, BTreeDisplayType display_type) const
 ERROR_T BTreeIndex::SanityCheck() const
 {
   // WRITE ME
-  return ERROR_UNIMPL;
+
+// - a block must be in exactly one of the free list, the super block, or a btree node
+// - the btree has no cycles
+// - the free list has no cycles
+// - only the superblock points to the root node
+// - interior nodes are pointed to only once
+// - leaf nodes are pointed to only once (regular btree) or twice (b+tree)
+// - no pointer points to a node on the free list
+// - keys in every btree node are in order
+// - except for the root, no node is "too empty" or "too full"
+// - traversing the btree gives the keys in order
+// - no duplicate keys (if the "unique" option was used in creating the tree)
+// - the key count in the superblock is the same as the actual number of keys in the tree's leaf nodes.
+
+  ERROR_T rc;
+  SIZE_T numberOfKeys;
+  rc = checkNodes(superblock.info.rootnode, SIZE_T &numberOfKeys);
+  if(rc){
+    return rc;
+  }
+  if (numberOfKeys != superblock.info.numkeys) {
+    return ERROR_INSANE;
+  }
+  return ERROR_NOERROR;
+}
+  
+ERROR_T BTreeIndex::checkNodes(const SIZE_T &node, SIZE_T &numberOfKeys) const {
+  // {HERE}
+  BTreeNode b;
+  ERROR_T rc;
+  SIZE_T ptr;
+  SIZE_T offset;
+  KEY_T tempKey;
+  KEY_T prev;
+  numberOfKeys = 0;
+  bool init = true;
+
+  rc = b.Unserialize(buffercache, node);
+  if(rc!=ERROR_NOERROR){
+    return rc;
+  }
+
+  switch (b.info.nodetype) { 
+  case BTREE_ROOT_NODE:
+  case BTREE_INTERIOR_NODE:
+    // checkSize();
+    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
+      return ERROR_INSANE;
+    if (b.info.numkeys>0) { 
+      for (offset=0;offset<=b.info.numkeys;offset++) { 
+        rc = b.GetPtr(offset,ptr);
+        if (rc) {
+          return rc;
+        }
+        rc = checkNodes(ptr,numberOfKeys);
+        if (rc) {
+          return rc;
+        }
+      }
+    }
+    return ERROR_NOERROR;
+    break;
+  case BTREE_LEAF_NODE:
+    // checkSize();
+    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
+      return ERROR_INSANE;
+    if (b.info.numkeys>0) {
+      numberOfKeys += b.info.numkeys;
+      for (offset=0;offset<=b.info.numkeys;offset++) {
+        rc=b.GetKey(offset,tempKey);
+        if (rc) {
+          return rc;
+        }
+        if(init) {
+          init = false;
+          prev = ptr;
+        } else {
+          if (prev==tempKey || prev<tempKey) {
+            prev = tempKey;
+          } else { 
+            return ERROR_INSANE;
+          }
+        }
+      }
+    }
+    return ERROR_NOERROR;
+    break;
+  default:
+    return ERROR_NOERROR;
+  }
 }
 
 ostream & BTreeIndex::Print(ostream &os) const
