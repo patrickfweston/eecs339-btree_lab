@@ -373,7 +373,6 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     SIZE_T& newRootPtr = newRootSizeT;
     rc = AllocateNode(newRootPtr);    
     BTreeNode newRoot(BTREE_ROOT_NODE, superblock.info.keysize, superblock.info.valuesize, buffercache->GetBlockSize());
- 
     // Update the superblock's rootnode pointer
     superblock.info.rootnode = newRootPtr; // NOTE: might be the newRootSizeT
     
@@ -382,43 +381,44 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
     newRoot.info.freelist = superblock.info.freelist;
     newRoot.info.numkeys = 1;
     rc = newRoot.SetKey(0, key);
-    rc = AllocateNode(ptr);
-    //b.Unserialize(buffercache, ptr);
-    b.info.parent = newRootPtr;
-    b.info.numkeys = 1;
-    b.info.nodetype = BTREE_LEAF_NODE;
-    b.info.keysize = superblock.info.keysize;
-    b.info.valuesize = superblock.info.valuesize;
-    b.info.blocksize = buffercache->GetBlockSize();    
+    //newRoot.SetPtr(0, ptr);
+    //newRoot.Serialize(buffercache, newRootPtr);
+
+    SIZE_T newLeaf;
+    SIZE_T& newLeafPtr = newLeaf;
+    rc = AllocateNode(newLeafPtr);
+    //b.Unserialize(buffercache, ptr);  
+    BTreeNode newLeafNode(BTREE_LEAF_NODE, superblock.info.keysize, superblock.info.valuesize, buffercache->GetBlockSize());
+    newLeafNode.info.parent = newRootPtr;
+    newLeafNode.info.numkeys = 1;
 
     cout << "Setting info data for root." << endl;
     //cout << "Number of slots: " << b.info.GetNumSlotsAsLeaf() << endl;
     // NOTE: not sure if this is needed
-    rc = b.SetKey(0, key);
+    rc = newLeafNode.SetKey(0, key);
     if (rc) {return rc;}
     //cout << "Key: " << key << endl;
     //cout << "Value: " << value << endl;
     //cout << "b.data: " << b.data << endl;
     //b.data = key;
     cout << "SetKey Root Call" << endl;
-    rc = b.SetVal(0, value);
+    rc = newLeafNode.SetVal(0, value);
     if (rc) {return rc;}
-    
     //key.data = value;
     //cout << "key.data: " << key.data << endl;
     cout << "SetVal Root Call" << endl;
  
-    //superblock.info.numkeys++;
-    newRoot.SetPtr(0, ptr);
-    cout << "SetPtr Root Call" << endl;
+    superblock.info.numkeys++;
+    newRoot.SetPtr(0, newLeafPtr);
+    //cout << "SetPtr Root Call" << endl;
 
     // Write back to disk
-    b.Serialize(buffercache, ptr);
+    newLeafNode.Serialize(buffercache, newLeafPtr);
     cout << "Serialize leaf" << endl;
     newRoot.Serialize(buffercache, newRootPtr);
     cout << "Write root back to disk." << endl;
 
-    cout << b.info.numkeys << " = " << superblock.info.numkeys << endl;
+    cout << newLeafNode.info.numkeys << " = " << superblock.info.numkeys << endl;
   }
   else {
     // Look up where the key should be inserted. Get a pointer for it. 
@@ -683,7 +683,7 @@ ERROR_T BTreeIndex::LookupForInsert(const SIZE_T &node, const KEY_T &key, SIZE_T
     return rc;
   }
 
-  cout << "NODE TYPE: " << b.info.nodetype << "Node: " << node << endl;
+  cout << "NODE TYPE: " << b.info.nodetype << "\tNode: " << node << endl;
 
   // Start the searching process, recursively moving down the tree
   // until we find our value
