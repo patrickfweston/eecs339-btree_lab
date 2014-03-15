@@ -598,9 +598,11 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 parent.SetKey(position, tempKey);
               }
 
+              cout << "Right interior: " << rightInterior << endl;
+
               // Now insert our new node and increment the number of keys the parent has
               // TODO: I think this should be the right node and not the left.
-              parent.SetPtr(insertionPoint, rightNode);
+              parent.SetPtr(insertionPoint+1, rightInterior);
               parent.SetKey(insertionPoint, middle);
             }
         } else {
