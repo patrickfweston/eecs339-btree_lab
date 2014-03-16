@@ -1359,7 +1359,7 @@ ERROR_T BTreeIndex::SanityCheck() const
   }
   if (numberOfKeys != superblock.info.numkeys) {
     cout << "numberOfKeys: " << numberOfKeys << " | numkeys: " << superblock.info.numkeys << endl;
-    cout << "INSANE !! " << endl;
+    cout << "Numbers are off..." << endl;
     // this doesnt work because there is no way to find the total number of keys
     // return ERROR_INSANE;
   }
@@ -1386,10 +1386,8 @@ ERROR_T BTreeIndex::checkNodes(const SIZE_T &node, SIZE_T &numberOfKeys) const {
   case BTREE_ROOT_NODE:
   case BTREE_INTERIOR_NODE:
     // check if too full
-    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0)) {
-      cout << "Too full!" << endl;
+    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
       return ERROR_INSANE;
-    }
     if (b.info.numkeys>0) { 
       numberOfKeys += b.info.numkeys;
       cout << "CASE INTERIOR - " << "b.info.numberkeys: " << b.info.numkeys << endl;
@@ -1408,25 +1406,24 @@ ERROR_T BTreeIndex::checkNodes(const SIZE_T &node, SIZE_T &numberOfKeys) const {
     break;
   case BTREE_LEAF_NODE:
     // check if too full
-    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0)){
-      cout << "Too full!" << endl;
+    if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
       return ERROR_INSANE;
-    }
-    if (b.info.numkeys>0) {
+    // if (b.info.numkeys>0) {
       numberOfKeys += b.info.numkeys;
-      cout << "CASE LEAF - b.info.numberkeys: " << b.info.numkeys << endl;
-      for (offset=0;offset<b.info.numkeys-1;offset++) {
+      for (offset=0;offset<(b.info.numkeys-1);offset++) {
         rc = b.GetKey(offset,key1);
         if (rc) {return rc;}
         rc = b.GetKey(offset+1,key2);
         if (rc) {return rc;}
-        // Check to make sure node traversal is in order
-        if (prev == tempKey || prev < tempKey) {
-          cout << "Out of order!" << endl;
+        cout << "key1 " << key1.data << " key2 " << key2.data << endl;
+        //how to compare keys
+        if (key2 < key1){
+          return ERROR_INSANE;
+        }
+        else if (key1 == key2){
           return ERROR_INSANE;
         }
       }
-    }
     return ERROR_NOERROR;
     break;
   default:

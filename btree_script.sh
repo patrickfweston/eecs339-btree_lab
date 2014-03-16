@@ -72,5 +72,5 @@ clear
 # ./btree_insert mydisk 64 zzr 19
 #./btree_insert mydisk 64 wap 19
 #./btree_insert mydisk 64 wcq 12
-#./btree_insert mydisk 64 wcr 19
+# #./btree_insert mydisk 64 wcr 19
 ./btree_display mydisk 64 normal
