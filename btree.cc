@@ -478,7 +478,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
       // cout << "superblock.info.rootnode (before) " << superblock.info.rootnode << endl;
 
-      cout << "b's keys " << b.info.numkeys << " right keys " << rightLeafNode.info.numkeys << endl;
+    //  cout << "b's keys " << b.info.numkeys << " right keys " << rightLeafNode.info.numkeys << endl;
 
       rightLeafNode.Serialize(buffercache, rightNodePtr);
 
@@ -488,7 +488,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       SIZE_T parentPtrT;
       SIZE_T& parentPtr = parentPtrT;
       // rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
-      rc = LookupPointer(superblock.info.rootnode, ptr, superblock.info.rootnode, parentPtr);
+      rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
       // cout << "parent pointer: " << parentPtr;
       //SIZE_T& parentPtr2 = b.info.parent;
       SIZE_T& rightInterior = rightNode;
@@ -519,7 +519,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             // Also see if the root is full or not. If it is we need to split and also create a 
             // new root for the tree
             if (SuperRoot.info.numkeys+1 >= rootFull) {
-              cout << "---------- CASE: Root is full ----------" << endl;
+            //  cout << "---------- CASE: Root is full ----------" << endl;
+             // cout << "Root Full Parent: " << parentPtr << endl;
 
               // Need to create a new root node
               BTreeNode newRoot(BTREE_ROOT_NODE,
@@ -548,7 +549,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               // Check to see if the root node is actually acting like a root node
               // and not a leaf (aka skip the first case where it is a leaf)
               if (SuperRoot.info.nodetype == BTREE_ROOT_NODE) {
-                cout << "-------- ROOT NODE CASE --------" << endl;
+              //  cout << "-------- ROOT NODE CASE --------" << endl;
+              //  cout << "Root Node Case Parent: " << parentPtr << endl;
                 // TODO: I'm pretty sure we still need to fill in our key that causes
                 // it to "overflow". Then we need to sort the current root and split
                 // it up into two new ones. I'll work on this tomorrow morning when I
@@ -625,7 +627,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 // Update the parent's number of keys
                 parent.info.numkeys = rootKeysLeft;
 
-                cout << "Root's Left keys " << parent.info.numkeys << " Right's: " << newRootRight.info.numkeys << endl;
+            //    cout << "Root's Left keys " << parent.info.numkeys << " Right's: " << newRootRight.info.numkeys << endl;
 
                 // Make sure the left and right child both point to the new root
                 parent.info.parent = newRootPtr;
@@ -640,6 +642,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 newRoot.SetPtr(1, newRootRightChildPtr);
 
                 newRootRight.Serialize(buffercache, newRootRightChildPtr);
+                parent.Serialize(buffercache, ptr);
+                parent.Unserialize(buffercache, ptr);
               } else {
                 // Update our root's pointers
                 newRoot.SetPtr(0, parentPtr);
@@ -654,7 +658,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
             } 
             // If the root isn't full, just shift over the keys like normal
             else {
-              cout << "---------- CASE: Root is NOT full ----------" << endl;
+             // cout << "---------- CASE: Root is NOT full ----------" << endl;
               // Find the value we need to be inserting into the parent node
               KEY_T middle;
               right.GetKey(0, middle);
@@ -677,7 +681,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
               // Increment the number of keys the parent is going to have
               parent.info.numkeys++;
-              cout << "Key: " << key.data << " Parent: " << parentPtr << " numkeys: " << parent.info.numkeys << endl;
+//              cout << "Keyz: " << key.data << " Parentz: " << parentPtr << " numkeys: " << parent.info.numkeys << endl;
 
               // cout << "parentPtr: " << parentPtr << endl;
               // cout << "parent node type: " << parent.info.nodetype << endl;
@@ -712,14 +716,14 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
         } 
         // If we're just dealing with an interior node, then move the keys over
         else {
-          cout << "---------- CASE: Interior node ----------" << endl;
+         // cout << "---------- CASE: Interior node ----------" << endl;
 
           b.Serialize(buffercache, ptr);
           parent.Serialize(buffercache, parentPtr);
           KEY_T middle;
           right.GetKey(0, middle);
 
-          Bubble(parentPtr, middle, rightNode);
+          Bubble(parentPtr, middle, rightNode, false);
 
           b.Unserialize(buffercache, ptr);
           parent.Unserialize(buffercache, parentPtr);
@@ -729,141 +733,12 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
           //cout << "test key: " << test.data << endl;
 
           notRootNode = false;
-          // cout << "INTERIOR:" << endl << "numslots: " << numslots << " full: " << full << endl;
-          // cout << "Current node: " << rightNode << endl;
-          // cout << "Node's parent: " << parentPtr << endl;
 
-          // notRootNode = false;
-
-          // // Find the value we need to be inserting into the parent node
-          // KEY_T middle;
-          // right.GetKey(0, middle);
-
-          // cout << "Middle " << middle << endl;
-
-          // // Let's search where to insert our key into the interior node
-          // SIZE_T insertionPoint;
-          // for (insertionPoint=0;insertionPoint<parent.info.numkeys;insertionPoint++) { 
-          //   // Get the key value
-          //   rc=parent.GetKey(insertionPoint,testkey);
-          //   // Do standard error checking
-          //   if (rc) {  return rc; }
-          //   // If we find something
-          //   if(middle<testkey) {
-          //     // then break out of the loop
-          //     break;
-          //   }
-          // }
-
-          // // cout << endl << endl << endl << "parentPtr: " << parentPtr << endl;
-          // // cout << "parent node type: " << parent.info.nodetype << endl;
-
-          // // cout << "Key Position: " << parent.info.numkeys-1 << endl;
-          //  cout << "Insertion point: " << insertionPoint << endl;
-
-          // // Increment the number of keys the parent is going to have
-          // parent.info.numkeys++;
-
-          // cout << "Number parent keys: " << parent.info.numkeys << endl;
-
-          // // Make room by shifting the ptrs
-          // for (SIZE_T position = parent.info.numkeys-1; position > insertionPoint; position--) {
-          //   KEY_T tempKey;
-          //   parent.GetKey(position-1, tempKey);
-          //   parent.SetKey(position, tempKey);
-          // }
-
-          // //cout << "Ptr Position: " << parent.info.numkeys << endl;
-          // //cout << "Insertion point: " << insertionPoint << endl;
-
-          // // Make room for our new key by sorting and shifting to the right
-          // for (SIZE_T position = parent.info.numkeys; position > insertionPoint; position--) {
-          //   SIZE_T tempPtr;
-          //   cout << "position: " << position << endl;
-          //   parent.GetPtr(position-1, tempPtr);
-          //   parent.SetPtr(position, tempPtr);
-          // }
-
-          // cout << "Setting the keys and ptr" << endl;
-          // // Now insert our new node and increment the number of keys the parent has
-          // // TODO: I think this should be the right node and not the left.
-          // parent.SetPtr(insertionPoint+1, rightNode);
-          // parent.SetKey(insertionPoint, middle);
-
-          // cout << "parent's num keys " << parent.info.numkeys << " full: " << full << endl;
-
-          // // Check to see if the parent is more full than allowed. Split if needed
-          // if(parent.info.numkeys >= full) {
-          //   cout << "---------- (Interior is full) ----------" << endl;
-
-          //   notRootNode = true;
-
-          //   // Since it's too full, we need to split it.
-          //   SIZE_T numkeysLeft = floor((1.0/2.0) * parent.info.numkeys);
-          //   SIZE_T numkeysRight = parent.info.numkeys - numkeysLeft;
-
-          //   // Create a new parent interior node
-          //   SIZE_T newParentRight;
-          //   SIZE_T& newParentRightPtr = newParentRight;
-          //   BTreeNode newParent(BTREE_INTERIOR_NODE,
-          //     superblock.info.keysize,
-          //     superblock.info.valuesize,
-          //     buffercache->GetBlockSize());
-            
-          //   rc = AllocateNode(newParentRight);
-          //   if (rc!=ERROR_NOERROR) {return rc;}
-
-          //   // Update the parameters
-          //   newParent.info.parent = parent.info.parent;
-          //   newParent.info.numkeys = numkeysRight;
-
-          //   cout << "New interior node: " << newParentRight << endl;
-          //   cout << "Num keys left " << numkeysLeft << " right: " << numkeysRight << endl;
-
-
-          //   // Copy over the keys
-          //   for (int i = numkeysLeft; i < parent.info.numkeys; i++) {
-          //     cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
-
-          //     KEY_T tempKey;
-          //     parent.GetKey(i, tempKey);
-          //     newParent.SetKey(i-numkeysLeft, tempKey);
-          //   }
-
-          //   // Copy over the pointers
-          //   for (int i = numkeysLeft; i < parent.info.numkeys; i++) {
-          //     cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
-              
-          //     SIZE_T tempPtr;
-          //     parent.GetPtr(i, tempPtr);
-          //     newParent.SetPtr(i-numkeysLeft, tempPtr);
-          //   }
-
-          //   // Update the size of the old parent
-          //   parent.info.numkeys = numkeysLeft;
-
-          //   right.info.parent = newParentRight;
-          //   SIZE_T rightParT;
-          //   SIZE_T& rightPar = rightParT; 
-          //   rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
-
-          //   newParent.Serialize(buffercache, newParentRight);
-
-          //   parent.GetKey(0, lookupKey);
-          //   // Update the loop's parent pointer to the next level up
-          //   rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
-          //   // Also update the loop's right child node
-          //   cout << "Lookup's parent pointer: " << parentPtr;
-
-          //   rightInterior = newParentRightPtr;
-
-          //   notRootNode = false;
-          //}
         }
 
         parent.Serialize(buffercache, parentPtr);
         right.Serialize(buffercache, rightNode);
-        cout << "-------------------------------- WHILE " << whileCount << "------------- " << endl;
+        
         whileCount++;
       } while (notRootNode);
       // Get the left pointer's parent by moving up to the right and seeing where it points to
@@ -900,8 +775,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 }
 
 
-ERROR_T BTreeIndex::Bubble(SIZE_T &n, KEY_T& key, SIZE_T &child) {
-  cout << "--------------- BUBBLE ---------------" << endl;
+ERROR_T BTreeIndex::Bubble(SIZE_T &n, KEY_T& key, SIZE_T &child, bool goLeft) {
+ // cout << "--------------- BUBBLE ---------------" << endl;
+ // cout << "Nodezz: " << n << endl;
   ERROR_T rc;
   KEY_T testkey;
   BTreeNode node;
@@ -928,10 +804,10 @@ ERROR_T BTreeIndex::Bubble(SIZE_T &n, KEY_T& key, SIZE_T &child) {
   // Increment the number of keys the parent is going to have
   node.info.numkeys++;
 
-  cout << "Nodez: " << n << endl;
-  cout << "Key to insert: " << key.data << endl;
-  cout << "Insertion Point: " << insertionPoint << endl;
-  cout << "node numkeys: " << node.info.numkeys << endl;
+  // cout << "Nodez: " << n << endl;
+  // cout << "Key to insert: " << key.data << endl;
+  // cout << "Insertion Point: " << insertionPoint << endl;
+  // cout << "node numkeys: " << node.info.numkeys << endl;
 
   // Make room by shifting the ptrs
   for (SIZE_T position = node.info.numkeys-1; position > insertionPoint; position--) {
@@ -951,79 +827,94 @@ ERROR_T BTreeIndex::Bubble(SIZE_T &n, KEY_T& key, SIZE_T &child) {
   // TODO: I think this should be the right node and not the left.
   node.SetPtr(insertionPoint+1, child);
   node.SetKey(insertionPoint, key);
-  cout << "Insert key success" << endl;
 
   KEY_T superTemp;
   node.GetKey(insertionPoint, superTemp);
 
-  cout << "Full: " << full << endl;
-  cout << "node.info.numkeys: " << node.info.numkeys << endl;
-
   node.Serialize(buffercache, n);
 
   if (node.info.numkeys >= full) {
-    node.Unserialize(buffercache, n);
+      node.Unserialize(buffercache, n);
 
-    // Since it's too full, we need to split it.
-    SIZE_T numkeysLeft = floor((1.0/2.0) * node.info.numkeys);
-    SIZE_T numkeysRight = node.info.numkeys - numkeysLeft;
+      // Since it's too full, we need to split it.
+      SIZE_T numkeysLeft = floor((1.0/2.0) * node.info.numkeys);
+      SIZE_T numkeysRight = node.info.numkeys - numkeysLeft;
 
-    // Create a new parent interior node
-    SIZE_T newParentRight;
-    SIZE_T& newParentRightPtr = newParentRight;
-    BTreeNode newParent(BTREE_INTERIOR_NODE,
-      superblock.info.keysize,
-      superblock.info.valuesize,
-      buffercache->GetBlockSize());
+      // Create a new parent interior node
+      SIZE_T newParentRight;
+      SIZE_T& newParentRightPtr = newParentRight;
+      BTreeNode newParent(BTREE_INTERIOR_NODE,
+        superblock.info.keysize,
+        superblock.info.valuesize,
+        buffercache->GetBlockSize());
 
-    rc = AllocateNode(newParentRight);
-    if (rc!=ERROR_NOERROR) {return rc;}
+      rc = AllocateNode(newParentRight);
+      if (rc!=ERROR_NOERROR) {return rc;}
 
-    newParent.info.numkeys = numkeysRight;
+      newParent.info.numkeys = numkeysRight;
 
-    cout << "New interior node: " << newParentRight << endl;
-    cout << "Num keys left " << numkeysLeft << " right: " << numkeysRight << endl;
+      // Copy over the keys
+      for (int i = numkeysLeft; i < node.info.numkeys-1; i++) {
+        KEY_T tempKey;
+        node.GetKey(i+1, tempKey);
+        newParent.SetKey(i-numkeysLeft, tempKey);
+      }
 
+      // Copy over the pointers
+      for (int i = numkeysLeft; i < node.info.numkeys; i++) {
+        SIZE_T tempPtr;
+        node.GetPtr(i+1, tempPtr);
+        newParent.SetPtr(i-numkeysLeft, tempPtr);
+      }
 
-    // Copy over the keys
-    for (int i = numkeysLeft; i < node.info.numkeys-1; i++) {
-      cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
+      KEY_T middle;
+      newParent.GetKey(0, middle);
 
-      KEY_T tempKey;
-      node.GetKey(i+1, tempKey);
-      newParent.SetKey(i-numkeysLeft, tempKey);
-    }
+      // Update the size of the old parent
+      node.info.numkeys = numkeysLeft;
 
-    // Copy over the pointers
-    for (int i = numkeysLeft; i < node.info.numkeys; i++) {
-      cout << "Get from: " << i << " and store in: " << i-numkeysLeft << endl;
-      
-      SIZE_T tempPtr;
-      node.GetPtr(i+1, tempPtr);
-      newParent.SetPtr(i-numkeysLeft, tempPtr);
-    }
+      newParent.info.numkeys = numkeysRight-1;
 
-    KEY_T middle;
-    newParent.GetKey(0, middle);
+      SIZE_T parentT;
+      SIZE_T& parent = parentT;
+    //  cout << "Looking for: " << n << endl;
+      rc = LookupPointer(superblock.info.rootnode, n, superblock.info.rootnode, parent);
+    //  cout << "Key passed: " << middle.data << endl << " parent " << parent << endl;
 
-    // Update the size of the old parent
-    node.info.numkeys = numkeysLeft;
+      newParent.Serialize(buffercache, newParentRightPtr);
+      node.Serialize(buffercache, n);
 
-    newParent.info.numkeys = numkeysRight-1;
+    //  cout << "newParentRightPtr " << newParentRightPtr << endl;
+    // cout << "n " << n << endl;
 
-    SIZE_T parentT;
-    SIZE_T& parent = parentT;
-    rc = LookupPointer(superblock.info.rootnode, n, superblock.info.rootnode, parent);
-    cout << "Key passed: " << middle.data << endl << " parent " << parent << endl;
+      numkeysLeft--;
+      numkeysRight--;
 
-    newParent.Serialize(buffercache, newParentRightPtr);
-    node.Serialize(buffercache, n);
+      if (insertionPoint > numkeysLeft) {
+        goLeft = false;
+      } else {
+        goLeft = true;
+      }
 
-    cout << "newParentRightPtr " << newParentRightPtr << endl;
-    cout << "n " << n << endl;
+      goLeft = false;
 
-    Bubble(parent, middle, newParentRightPtr);
-    //Bubble(parent, middle, n);
+      if (!goLeft) {
+        //Bubble(parent, middle, newParentRightPtr, false);
+      }
+      else { 
+        //Bubble(parent, middle, n, true);
+      }
+
+      if (node.info.nodetype == BTREE_ROOT_NODE) {
+        BTreeNode rootpointer;
+        rootpointer.Unserialize(buffercache, superblock.info.rootnode);
+
+        superblock.info.rootnode = newParentRightPtr;
+
+        rootpointer.Serialize(buffercache, superblock.info.rootnode);
+      }
+
+      Bubble(parent, middle, newParentRightPtr, false);
   }
   return ERROR_NOERROR;
 }
@@ -1097,7 +988,7 @@ ERROR_T BTreeIndex::LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T &previou
     return rc;
   }
 
-  cout << "NODE TYPE: " << b.info.nodetype << "Node: " << node << endl;
+  //cout << "NODE TYPE: " << b.info.nodetype << "Node: " << node << endl;
 
   // Start the searching process, recursively moving down the tree
   // until we find our value
@@ -1109,7 +1000,7 @@ ERROR_T BTreeIndex::LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T &previou
 
     // Scan through key/ptr pairs
     //and recurse if possible
-    cout << "Number of keys in interior/root: " << b.info.numkeys << endl;
+    //cout << "Number of keys in interior/root: " << b.info.numkeys << endl;
     for (offset=0;offset<b.info.numkeys;offset++) { 
       rc=b.GetKey(offset,testkey);
       if (rc) {  return rc; }
@@ -1118,10 +1009,10 @@ ERROR_T BTreeIndex::LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T &previou
         // OK, so we now have the first key that's larger
         // so we ned to recurse on the ptr immediately previous to 
         // this one, if it exists
-        cout << "Interior" << endl;
+       // cout << "Interior" << endl;
         rc=b.GetPtr(offset,ptr);
 
-        cout << "recurse?" << endl << "ptr: " << ptr;
+       // cout << "recurse?" << endl << "ptr: " << ptr;
         return LookupParent(ptr, key, prev, returnVal);
       }
     }
@@ -1129,7 +1020,7 @@ ERROR_T BTreeIndex::LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T &previou
     if (b.info.numkeys>0) { 
       rc=b.GetPtr(b.info.numkeys,ptr);
       if (rc) { return rc; }
-        cout << "ptr: " << ptr << " key: " << key << endl;
+       // cout << "ptr: " << ptr << " key: " << key << endl;
         return LookupParent(ptr, key, prev, returnVal);
     } else {
       // There are no keys at all on this node, so nowhere to go
@@ -1141,7 +1032,7 @@ ERROR_T BTreeIndex::LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T &previou
     // We've found our leaf node, return up and do some searching
     // Pointer to the node itself
     returnVal = previous;
-    cout << "Leaf" << endl;
+ //   cout << "Leaf" << endl;
     return ERROR_NOERROR;
     break;
   }
@@ -1166,64 +1057,41 @@ ERROR_T BTreeIndex::LookupPointer(const SIZE_T &node, SIZE_T& lookfor, SIZE_T &p
   rc = b.Unserialize(buffercache,node);
   // Do some extra error checking (like update does)
   if (rc!=ERROR_NOERROR) { 
+    b.Serialize(buffercache, node);
     return rc;
   }
 
-  cout << "NODE TYPE: " << b.info.nodetype << "Node: " << node << endl;
 
-  // Start the searching process, recursively moving down the tree
-  // until we find our value
-  switch (b.info.nodetype) { 
-  case BTREE_ROOT_NODE: {}
-  case BTREE_INTERIOR_NODE: {
+  if (b.info.nodetype != BTREE_LEAF_NODE) {
+
+    // Start the searching process, recursively moving down the tree
+    // until we find our value
+
     //SIZE_T previousT;
     SIZE_T& prev = const_cast<SIZE_T&>(node);
 
     // Scan through key/ptr pairs
     //and recurse if possible
-    cout << "Number of keys in interior/root: " << b.info.numkeys << endl;
+   // cout << "Number of keys in interior/root: " << b.info.numkeys << endl;
     for (offset=0;offset<b.info.numkeys;offset++) { 
       // OK, so we now have the first key that's larger
       // so we ned to recurse on the ptr immediately previous to 
       // this one, if it exists
-      cout << "Interior" << endl;
-      cout << "ptr: " << ptr << " previous: " << previous << " node " << node << " lookfor " << lookfor << endl;
+  //    cout << "Interior" << endl;
+  //    cout << "ptr: " << ptr << " previous: " << previous << " node " << node << " lookfor " << lookfor << endl;
       rc=b.GetPtr(offset,ptr);
 
       if (ptr==lookfor) {
         returnVal = previous;
+        b.Serialize(buffercache, node);
         return ERROR_NOERROR;
       }
-
-      cout << "recurse?" << endl << "ptr: " << ptr;
+      b.Serialize(buffercache, node);
       return LookupPointer(ptr, lookfor, prev, returnVal);
     }
-    // if we got here, we need to go to the next pointer, if it exists
-    if (b.info.numkeys>0) { 
-      rc=b.GetPtr(b.info.numkeys,ptr);
-      if (rc) { return rc; }
-        return LookupPointer(ptr, lookfor, prev, returnVal);
-    } else {
-      // There are no keys at all on this node, so nowhere to go
-      return ERROR_NONEXISTENT;
-    }
-    break;
-  }
-  case BTREE_LEAF_NODE: {
-    // We've found our leaf node, return up and do some searching
-    // Pointer to the node itself
-    returnVal = previous;
-    cout << "Leaf" << endl;
-    return ERROR_NOERROR;
-    break;
-  }
-  default: {
-    // We can't be looking at anything other than a root, internal, or leaf
-    return ERROR_INSANE;
-    break;
-  }
   }
 }
+
 
 
 

@@ -1,76 +1,307 @@
 #!/bin/bash
 clear
 ./deletedisk mydisk
-./makedisk mydisk 1024 128 1 16 64 100 10 .28
+./makedisk mydisk 1024 1024 1 16 64 100 10 .28
 ./btree_init mydisk 64 3 6
-./btree_insert mydisk 64 aaa 15
-./btree_insert mydisk 64 baa 4
-./btree_insert mydisk 64 caa 8
-./btree_insert mydisk 64 aha 12
-./btree_insert mydisk 64 daa 6
-./btree_insert mydisk 64 eaa 5
-./btree_insert mydisk 64 faa 9
-./btree_insert mydisk 64 gaa 4
-./btree_insert mydisk 64 haa 12
-./btree_insert mydisk 64 iaa 15
-./btree_insert mydisk 64 aja 12
-./btree_insert mydisk 64 jaa 12
-./btree_insert mydisk 64 kaa 19
-./btree_insert mydisk 64 laa 19
-./btree_insert mydisk 64 afa 9
-./btree_insert mydisk 64 aga 4
- ./btree_insert mydisk 64 aia 15
- ./btree_insert mydisk 64 aka 19
- ./btree_insert mydisk 64 ala 19
- ./btree_insert mydisk 64 cja 12
-./btree_insert mydisk 64 cka 19
-./btree_insert mydisk 64 tja 12
-./btree_insert mydisk 64 tka 19
-./btree_insert mydisk 64 tla 19
-./btree_insert mydisk 64 bja 12
-./btree_insert mydisk 64 bka 19
-./btree_insert mydisk 64 bla 19
-./btree_insert mydisk 64 dab 19
-./btree_insert mydisk 64 dac 19
-./btree_insert mydisk 64 dad 19
-./btree_insert mydisk 64 dae 19
-./btree_insert mydisk 64 daf 19
-./btree_insert mydisk 64 dag 19
-./btree_insert mydisk 64 bbp 19
-./btree_insert mydisk 64 bbo 19
-./btree_insert mydisk 64 bbt 19
-./btree_insert mydisk 64 bbq 19
-./btree_insert mydisk 64 bbs 19
-./btree_insert mydisk 64 bbe 19
-./btree_insert mydisk 64 bbz 19
-./btree_insert mydisk 64 bcb 1
-./btree_insert mydisk 64 bza 2
-./btree_insert mydisk 64 bjz 3
-./btree_insert mydisk 64 bkz 19
-./btree_insert mydisk 64 blz 19
-./btree_insert mydisk 64 aaf 9
-./btree_insert mydisk 64 aag 4
-./btree_insert mydisk 64 ajk 15
-./btree_insert mydisk 64 ajl 15
-./btree_insert mydisk 64 xjm 15
-./btree_insert mydisk 64 xak 19
-./btree_insert mydisk 64 xal 19
-./btree_insert mydisk 64 xcj 12
-./btree_insert mydisk 64 xcm 19
-./btree_insert mydisk 64 xcn 19
-./btree_insert mydisk 64 xao 19
-./btree_insert mydisk 64 xap 19
-./btree_insert mydisk 64 xcq 12
-./btree_insert mydisk 64 xcr 19
- ./btree_insert mydisk 64 zao 19
- ./btree_insert mydisk 64 zap 19
- ./btree_insert mydisk 64 zcq 12
-# ./btree_insert mydisk 64 zcr 19
-# ./btree_insert mydisk 64 zzo 19
-# ./btree_insert mydisk 64 zzp 19
-# ./btree_insert mydisk 64 zzq 19
-# ./btree_insert mydisk 64 zzr 19
-#./btree_insert mydisk 64 wap 19
-#./btree_insert mydisk 64 wcq 12
-#./btree_insert mydisk 64 wcr 19
+
+./btree_insert mydisk 64 aaa 1
+./btree_insert mydisk 64 aba 1
+./btree_insert mydisk 64 aca 1
+./btree_insert mydisk 64 ada 1
+ ./btree_insert mydisk 64 aea 1
+ ./btree_insert mydisk 64 afa 1
+ ./btree_insert mydisk 64 aga 1
+ ./btree_insert mydisk 64 aha 1
+ ./btree_insert mydisk 64 aia 1
+ ./btree_insert mydisk 64 aja 1
+ ./btree_insert mydisk 64 aka 1
+./btree_insert mydisk 64 ala 1
+./btree_insert mydisk 64 ama 1
+./btree_insert mydisk 64 ana 1
+./btree_insert mydisk 64 aoa 1
+./btree_insert mydisk 64 apa 1
+./btree_insert mydisk 64 aca 1
+./btree_insert mydisk 64 ara 1
+./btree_insert mydisk 64 asa 1
+./btree_insert mydisk 64 ata 1
+./btree_insert mydisk 64 aua 1
+./btree_insert mydisk 64 ava 1
+./btree_insert mydisk 64 awa 1
+./btree_insert mydisk 64 axa 1
+./btree_insert mydisk 64 aya 1
+./btree_insert mydisk 64 aza 1
+
+./btree_insert mydisk 64 aab 1
+./btree_insert mydisk 64 abb 1
+./btree_insert mydisk 64 acb 1
+./btree_insert mydisk 64 adb 1
+./btree_insert mydisk 64 aeb 1
+./btree_insert mydisk 64 afb 1
+./btree_insert mydisk 64 agb 1
+./btree_insert mydisk 64 ahb 1
+./btree_insert mydisk 64 aib 1
+./btree_insert mydisk 64 ajb 1
+./btree_insert mydisk 64 akb 1
+./btree_insert mydisk 64 alb 1
+./btree_insert mydisk 64 amb 1
+./btree_insert mydisk 64 anb 1
+./btree_insert mydisk 64 aob 1
+./btree_insert mydisk 64 apb 1
+./btree_insert mydisk 64 acb 1
+./btree_insert mydisk 64 arb 1
+./btree_insert mydisk 64 asb 1
+./btree_insert mydisk 64 atb 1
+./btree_insert mydisk 64 aub 1
+./btree_insert mydisk 64 avb 1
+./btree_insert mydisk 64 awb 1
+./btree_insert mydisk 64 axb 1
+./btree_insert mydisk 64 ayb 1
+./btree_insert mydisk 64 azb 1
+
+./btree_insert mydisk 64 aac 1
+./btree_insert mydisk 64 abc 1
+./btree_insert mydisk 64 acc 1
+./btree_insert mydisk 64 adc 1
+./btree_insert mydisk 64 aec 1
+./btree_insert mydisk 64 afc 1
+./btree_insert mydisk 64 agc 1
+./btree_insert mydisk 64 ahc 1
+./btree_insert mydisk 64 aic 1
+./btree_insert mydisk 64 ajc 1
+./btree_insert mydisk 64 akc 1
+./btree_insert mydisk 64 alc 1
+./btree_insert mydisk 64 amc 1
+./btree_insert mydisk 64 anc 1
+./btree_insert mydisk 64 aoc 1
+./btree_insert mydisk 64 apc 1
+./btree_insert mydisk 64 acc 1
+./btree_insert mydisk 64 arc 1
+./btree_insert mydisk 64 asc 1
+./btree_insert mydisk 64 atc 1
+./btree_insert mydisk 64 auc 1
+./btree_insert mydisk 64 avc 1
+./btree_insert mydisk 64 awc 1
+./btree_insert mydisk 64 axc 1
+./btree_insert mydisk 64 ayc 1
+./btree_insert mydisk 64 azc 1
+
+./btree_insert mydisk 64 aad 1
+./btree_insert mydisk 64 abd 1
+./btree_insert mydisk 64 acd 1
+./btree_insert mydisk 64 add 1
+./btree_insert mydisk 64 aed 1
+./btree_insert mydisk 64 afd 1
+./btree_insert mydisk 64 agd 1
+./btree_insert mydisk 64 ahd 1
+./btree_insert mydisk 64 aid 1
+./btree_insert mydisk 64 ajd 1
+./btree_insert mydisk 64 akd 1
+./btree_insert mydisk 64 ald 1
+./btree_insert mydisk 64 amd 1
+./btree_insert mydisk 64 and 1
+./btree_insert mydisk 64 aod 1
+./btree_insert mydisk 64 apd 1
+./btree_insert mydisk 64 acd 1
+./btree_insert mydisk 64 ard 1
+./btree_insert mydisk 64 asd 1
+./btree_insert mydisk 64 atd 1
+./btree_insert mydisk 64 aud 1
+./btree_insert mydisk 64 avd 1
+./btree_insert mydisk 64 awd 1
+./btree_insert mydisk 64 axd 1
+./btree_insert mydisk 64 ayd 1
+./btree_insert mydisk 64 azd 1
+
+
+./btree_insert mydisk 64 aae 1
+./btree_insert mydisk 64 abe 1
+./btree_insert mydisk 64 ace 1
+./btree_insert mydisk 64 ade 1
+./btree_insert mydisk 64 aee 1
+./btree_insert mydisk 64 afe 1
+./btree_insert mydisk 64 age 1
+./btree_insert mydisk 64 ahe 1
+./btree_insert mydisk 64 aie 1
+./btree_insert mydisk 64 aje 1
+./btree_insert mydisk 64 ake 1
+./btree_insert mydisk 64 ale 1
+./btree_insert mydisk 64 ame 1
+./btree_insert mydisk 64 ane 1
+./btree_insert mydisk 64 aoe 1
+./btree_insert mydisk 64 ape 1
+./btree_insert mydisk 64 ace 1
+./btree_insert mydisk 64 are 1
+./btree_insert mydisk 64 ase 1
+./btree_insert mydisk 64 ate 1
+./btree_insert mydisk 64 aue 1
+./btree_insert mydisk 64 ave 1
+./btree_insert mydisk 64 awe 1
+./btree_insert mydisk 64 axe 1
+./btree_insert mydisk 64 aye 1
+./btree_insert mydisk 64 aze 1
+
+./btree_insert mydisk 64 aaf 1
+./btree_insert mydisk 64 abf 1
+./btree_insert mydisk 64 acf 1
+./btree_insert mydisk 64 adf 1
+./btree_insert mydisk 64 aef 1
+./btree_insert mydisk 64 aff 1
+./btree_insert mydisk 64 agf 1
+./btree_insert mydisk 64 ahf 1
+./btree_insert mydisk 64 aif 1
+./btree_insert mydisk 64 ajf 1
+./btree_insert mydisk 64 akf 1
+./btree_insert mydisk 64 alf 1
+./btree_insert mydisk 64 amf 1
+./btree_insert mydisk 64 anf 1
+./btree_insert mydisk 64 aof 1
+./btree_insert mydisk 64 apf 1
+./btree_insert mydisk 64 acf 1
+./btree_insert mydisk 64 arf 1
+./btree_insert mydisk 64 asf 1
+./btree_insert mydisk 64 atf 1
+./btree_insert mydisk 64 auf 1
+./btree_insert mydisk 64 avf 1
+./btree_insert mydisk 64 awf 1
+./btree_insert mydisk 64 axf 1
+./btree_insert mydisk 64 ayf 1
+./btree_insert mydisk 64 azf 1
+
+./btree_insert mydisk 64 aag 1
+./btree_insert mydisk 64 abg 1
+./btree_insert mydisk 64 acg 1
+./btree_insert mydisk 64 adg 1
+./btree_insert mydisk 64 aeg 1
+./btree_insert mydisk 64 afg 1
+./btree_insert mydisk 64 agg 1
+./btree_insert mydisk 64 ahg 1
+./btree_insert mydisk 64 aig 1
+./btree_insert mydisk 64 ajg 1
+./btree_insert mydisk 64 akg 1
+./btree_insert mydisk 64 alg 1
+./btree_insert mydisk 64 amg 1
+./btree_insert mydisk 64 ang 1
+./btree_insert mydisk 64 aog 1
+./btree_insert mydisk 64 apg 1
+./btree_insert mydisk 64 acg 1
+./btree_insert mydisk 64 arg 1
+./btree_insert mydisk 64 asg 1
+./btree_insert mydisk 64 atg 1
+./btree_insert mydisk 64 aug 1
+./btree_insert mydisk 64 avg 1
+./btree_insert mydisk 64 awg 1
+./btree_insert mydisk 64 axg 1
+./btree_insert mydisk 64 ayg 1
+./btree_insert mydisk 64 azg 1
+
+./btree_insert mydisk 64 aaj 1
+./btree_insert mydisk 64 abj 1
+./btree_insert mydisk 64 acj 1
+./btree_insert mydisk 64 adj 1
+./btree_insert mydisk 64 aej 1
+./btree_insert mydisk 64 afj 1
+./btree_insert mydisk 64 agj 1
+./btree_insert mydisk 64 ahj 1
+./btree_insert mydisk 64 aij 1
+./btree_insert mydisk 64 ajj 1
+./btree_insert mydisk 64 akj 1
+./btree_insert mydisk 64 alj 1
+./btree_insert mydisk 64 amj 1
+./btree_insert mydisk 64 anj 1
+./btree_insert mydisk 64 aoj 1
+./btree_insert mydisk 64 apj 1
+./btree_insert mydisk 64 acj 1
+./btree_insert mydisk 64 arj 1
+./btree_insert mydisk 64 asj 1
+./btree_insert mydisk 64 atj 1
+./btree_insert mydisk 64 auj 1
+./btree_insert mydisk 64 avj 1
+./btree_insert mydisk 64 awj 1
+./btree_insert mydisk 64 axj 1
+./btree_insert mydisk 64 ayj 1
+./btree_insert mydisk 64 azj 1
+
+./btree_insert mydisk 64 aak 1
+./btree_insert mydisk 64 abk 1
+./btree_insert mydisk 64 ack 1
+./btree_insert mydisk 64 adk 1
+./btree_insert mydisk 64 aek 1
+./btree_insert mydisk 64 afk 1
+./btree_insert mydisk 64 agk 1
+./btree_insert mydisk 64 ahk 1
+./btree_insert mydisk 64 aik 1
+./btree_insert mydisk 64 ajk 1
+./btree_insert mydisk 64 akk 1
+./btree_insert mydisk 64 alk 1
+./btree_insert mydisk 64 amk 1
+./btree_insert mydisk 64 ank 1
+./btree_insert mydisk 64 aok 1
+./btree_insert mydisk 64 apk 1
+./btree_insert mydisk 64 ack 1
+./btree_insert mydisk 64 ark 1
+./btree_insert mydisk 64 ask 1
+./btree_insert mydisk 64 atk 1
+./btree_insert mydisk 64 auk 1
+./btree_insert mydisk 64 avk 1
+./btree_insert mydisk 64 awk 1
+./btree_insert mydisk 64 axk 1
+./btree_insert mydisk 64 ayk 1
+./btree_insert mydisk 64 azk 1
+
+
+./btree_insert mydisk 64 aah 1
+./btree_insert mydisk 64 abh 1
+./btree_insert mydisk 64 ach 1
+./btree_insert mydisk 64 adh 1
+./btree_insert mydisk 64 aeh 1
+./btree_insert mydisk 64 afh 1
+./btree_insert mydisk 64 agh 1
+./btree_insert mydisk 64 ahh 1
+./btree_insert mydisk 64 aih 1
+./btree_insert mydisk 64 ajh 1
+./btree_insert mydisk 64 akh 1
+./btree_insert mydisk 64 alh 1
+./btree_insert mydisk 64 amh 1
+./btree_insert mydisk 64 anh 1
+./btree_insert mydisk 64 aoh 1
+./btree_insert mydisk 64 aph 1
+./btree_insert mydisk 64 ach 1
+./btree_insert mydisk 64 arh 1
+./btree_insert mydisk 64 ash 1
+./btree_insert mydisk 64 ath 1
+./btree_insert mydisk 64 auh 1
+./btree_insert mydisk 64 avh 1
+./btree_insert mydisk 64 awh 1
+./btree_insert mydisk 64 axh 1
+./btree_insert mydisk 64 ayh 1
+./btree_insert mydisk 64 azh 1
+
+./btree_insert mydisk 64 aaw 1
+./btree_insert mydisk 64 abw 1
+./btree_insert mydisk 64 acw 1
+./btree_insert mydisk 64 adw 1
+./btree_insert mydisk 64 aew 1
+./btree_insert mydisk 64 afw 1
+./btree_insert mydisk 64 agw 1
+./btree_insert mydisk 64 ahw 1
+./btree_insert mydisk 64 aiw 1
+./btree_insert mydisk 64 ajw 1
+./btree_insert mydisk 64 akw 1
+./btree_insert mydisk 64 alw 1
+./btree_insert mydisk 64 amw 1
+./btree_insert mydisk 64 anw 1
+./btree_insert mydisk 64 aow 1
+./btree_insert mydisk 64 apw 1
+./btree_insert mydisk 64 acw 1
+./btree_insert mydisk 64 arw 1
+./btree_insert mydisk 64 asw 1
+./btree_insert mydisk 64 atw 1
+./btree_insert mydisk 64 auw 1
+./btree_insert mydisk 64 avw 1
+./btree_insert mydisk 64 aww 1
+./btree_insert mydisk 64 axw 1
+./btree_insert mydisk 64 ayw 1
+./btree_insert mydisk 64 azw 1
+
+
 ./btree_display mydisk 64 normal

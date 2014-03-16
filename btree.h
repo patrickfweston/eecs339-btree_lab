@@ -129,7 +129,7 @@ public:
   ERROR_T LookupPointer(const SIZE_T &node, SIZE_T& lookfor, SIZE_T &previous, SIZE_T &returnVal);
 
 
-  ERROR_T Bubble(SIZE_T &n, KEY_T &key, SIZE_T &child);
+  ERROR_T Bubble(SIZE_T &n, KEY_T &key, SIZE_T &child, bool goLeft);
 
   // Here you should figure out if your index makes sense
   // Is it a tree?  Is it in order?  Is it balanced?  Does each node have
