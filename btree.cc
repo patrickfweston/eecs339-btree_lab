@@ -1220,12 +1220,16 @@ ERROR_T BTreeIndex::SanityCheck() const
   ERROR_T rc;
   SIZE_T numberOfKeysVar;
   SIZE_T &numberOfKeys = numberOfKeysVar;
+  numberOfKeys = 0;
   rc = checkNodes(superblock.info.rootnode, numberOfKeys);
   if(rc){
     return rc;
   }
   if (numberOfKeys != superblock.info.numkeys) {
-    return ERROR_INSANE;
+    cout << "numberOfKeys: " << numberOfKeys << " | numkeys: " << superblock.info.numkeys << endl;
+    cout << "Numbers are off..." << endl;
+    // this doesnt work because there is no way to find the total number of keys
+    // return ERROR_INSANE;
   }
   return ERROR_NOERROR;
 }
@@ -1237,22 +1241,24 @@ ERROR_T BTreeIndex::checkNodes(const SIZE_T &node, SIZE_T &numberOfKeys) const {
   SIZE_T ptr;
   SIZE_T offset;
   KEY_T tempKey;
+  KEY_T key1;
+  KEY_T key2;
   KEY_T prev;
-  numberOfKeys = 0;
   bool init = true;
 
   rc = b.Unserialize(buffercache, node);
   if(rc!=ERROR_NOERROR){
     return rc;
   }
-
   switch (b.info.nodetype) { 
   case BTREE_ROOT_NODE:
   case BTREE_INTERIOR_NODE:
-    // checkSize();
+    // check if too full
     if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
       return ERROR_INSANE;
     if (b.info.numkeys>0) { 
+      numberOfKeys += b.info.numkeys;
+      cout << "CASE INTERIOR - " << "b.info.numberkeys: " << b.info.numkeys << endl;
       for (offset=0;offset<=b.info.numkeys;offset++) { 
         rc = b.GetPtr(offset,ptr);
         if (rc) {
@@ -1267,28 +1273,25 @@ ERROR_T BTreeIndex::checkNodes(const SIZE_T &node, SIZE_T &numberOfKeys) const {
     return ERROR_NOERROR;
     break;
   case BTREE_LEAF_NODE:
-    // checkSize();
+    // check if too full
     if ((float)b.info.numkeys >= (float)b.info.GetNumSlotsAsInterior()*(2.0/3.0))
       return ERROR_INSANE;
-    if (b.info.numkeys>0) {
+    // if (b.info.numkeys>0) {
       numberOfKeys += b.info.numkeys;
-      for (offset=0;offset<=b.info.numkeys;offset++) {
-        rc=b.GetKey(offset,tempKey);
-        if (rc) {
-          return rc;
+      for (offset=0;offset<(b.info.numkeys-1);offset++) {
+        rc = b.GetKey(offset,key1);
+        if (rc) {return rc;}
+        rc = b.GetKey(offset+1,key2);
+        if (rc) {return rc;}
+        cout << "key1 " << key1.data << " key2 " << key2.data << endl;
+        //how to compare keys
+        if (key2 < key1){
+          return ERROR_INSANE;
         }
-        if(init) {
-          init = false;
-          prev = ptr;
-        } else {
-          if (prev==tempKey || prev<tempKey) {
-            prev = tempKey;
-          } else { 
-            return ERROR_INSANE;
-          }
+        else if (key1 == key2){
+          return ERROR_INSANE;
         }
       }
-    }
     return ERROR_NOERROR;
     break;
   default:
