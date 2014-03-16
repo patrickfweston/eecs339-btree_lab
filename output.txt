@@ -1,31 +1,9 @@
 NODE TYPE: 2Node: 9
-Number of keys in interior/root: 1
+Number of keys in interior/root: 2
 Interior
 recurse?
 ptr: 3NODE TYPE: 2Node: 3
-Number of keys in interior/root: 6
-ptr: 13 key: Block(length=3, data=0x646168, lastaccessed=-1, dirty=0)
-NODE TYPE: 4Node: 13
+Number of keys in interior/root: 5
+ptr: 17 key: Block(length=3, data=0x626362, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 17
 Leaf
-numslots: 10
-full: 6
-superblock.info.rootnode (before) 9
-NODE TYPE: 2Node: 9
-Number of keys in interior/root: 1
-Interior
-recurse?
-ptr: 3NODE TYPE: 2Node: 3
-Number of keys in interior/root: 6
-ptr: 13 key: Block(length=3, data=0x646168, lastaccessed=-1, dirty=0)
-NODE TYPE: 4Node: 13
-Leaf
-parent pointer: 3superblock 9
----------- CASE: Interior node ----------
-INTERIOR:
-numslots: 13 full: 8
-Current node: 14
-Node's parent: 3
-Middle Block(length=3, data=0x646167, lastaccessed=-1, dirty=0)
-Number parent keys: 7
-Insertion point: 7
-Setting the keys and ptr

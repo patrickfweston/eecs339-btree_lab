@@ -123,8 +123,13 @@ public:
   // A special user defined function to look up for insert
   ERROR_T LookupForInsert(const SIZE_T &node, const KEY_T &key, SIZE_T &returnVal);
 
-// A special user defined function to look up for insert
+  // A special user defined function to look up for insert
   ERROR_T LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T& previous, SIZE_T &returnVal);
+
+  ERROR_T LookupPointer(const SIZE_T &node, SIZE_T& lookfor, SIZE_T &previous, SIZE_T &returnVal);
+
+
+  ERROR_T Bubble(SIZE_T &n, KEY_T &key, SIZE_T &child);
 
   // Here you should figure out if your index makes sense
   // Is it a tree?  Is it in order?  Is it balanced?  Does each node have
