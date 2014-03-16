@@ -19,10 +19,10 @@ clear
 ./btree_insert mydisk 64 laa 19
 ./btree_insert mydisk 64 afa 9
 ./btree_insert mydisk 64 aga 4
-./btree_insert mydisk 64 aia 15
-./btree_insert mydisk 64 aka 19
-./btree_insert mydisk 64 ala 19
-./btree_insert mydisk 64 cja 12
+ ./btree_insert mydisk 64 aia 15
+ ./btree_insert mydisk 64 aka 19
+ ./btree_insert mydisk 64 ala 19
+ ./btree_insert mydisk 64 cja 12
 ./btree_insert mydisk 64 cka 19
 ./btree_insert mydisk 64 tja 12
 ./btree_insert mydisk 64 tka 19
@@ -52,15 +52,25 @@ clear
 ./btree_insert mydisk 64 aag 4
 ./btree_insert mydisk 64 ajk 15
 ./btree_insert mydisk 64 ajl 15
-# ./btree_insert mydisk 64 ajm 15
-#./btree_insert mydisk 64 aak 19
-# ./btree_insert mydisk 64 aal 19
-# ./btree_insert mydisk 64 acj 12
-# ./btree_insert mydisk 64 acm 19
-# ./btree_insert mydisk 64 acn 19
-# ./btree_insert mydisk 64 aao 19
-# ./btree_insert mydisk 64 aap 19
-# ./btree_insert mydisk 64 acq 12
-# ./btree_insert mydisk 64 acr 19
-
+./btree_insert mydisk 64 xjm 15
+./btree_insert mydisk 64 xak 19
+./btree_insert mydisk 64 xal 19
+./btree_insert mydisk 64 xcj 12
+./btree_insert mydisk 64 xcm 19
+./btree_insert mydisk 64 xcn 19
+./btree_insert mydisk 64 xao 19
+./btree_insert mydisk 64 xap 19
+./btree_insert mydisk 64 xcq 12
+./btree_insert mydisk 64 xcr 19
+ ./btree_insert mydisk 64 zao 19
+ ./btree_insert mydisk 64 zap 19
+ ./btree_insert mydisk 64 zcq 12
+# ./btree_insert mydisk 64 zcr 19
+# ./btree_insert mydisk 64 zzo 19
+# ./btree_insert mydisk 64 zzp 19
+# ./btree_insert mydisk 64 zzq 19
+# ./btree_insert mydisk 64 zzr 19
+#./btree_insert mydisk 64 wap 19
+#./btree_insert mydisk 64 wcq 12
+#./btree_insert mydisk 64 wcr 19
 ./btree_display mydisk 64 normal

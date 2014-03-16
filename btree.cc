@@ -478,6 +478,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
       // cout << "superblock.info.rootnode (before) " << superblock.info.rootnode << endl;
 
+      cout << "b's keys " << b.info.numkeys << " right keys " << rightLeafNode.info.numkeys << endl;
+
       rightLeafNode.Serialize(buffercache, rightNodePtr);
 
       KEY_T& lookupKey = const_cast<KEY_T&>(key);
@@ -485,7 +487,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
       // TODO: We need to see if we have space in the parent for the newly created right node. If we do, awesome. If not, we have to split again. Also, there's the special case if we're at the root. When that's the case, we need to create a new root node and update appropriate pointers. (note: a lot of the code for) this loop can be copied from below to handle more general cases. */
       SIZE_T parentPtrT;
       SIZE_T& parentPtr = parentPtrT;
-      rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
+      // rc = LookupParent(superblock.info.rootnode, lookupKey, superblock.info.rootnode, parentPtr);
+      rc = LookupPointer(superblock.info.rootnode, ptr, superblock.info.rootnode, parentPtr);
       // cout << "parent pointer: " << parentPtr;
       //SIZE_T& parentPtr2 = b.info.parent;
       SIZE_T& rightInterior = rightNode;
@@ -622,6 +625,8 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
                 // Update the parent's number of keys
                 parent.info.numkeys = rootKeysLeft;
 
+                cout << "Root's Left keys " << parent.info.numkeys << " Right's: " << newRootRight.info.numkeys << endl;
+
                 // Make sure the left and right child both point to the new root
                 parent.info.parent = newRootPtr;
 
@@ -672,6 +677,7 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
 
               // Increment the number of keys the parent is going to have
               parent.info.numkeys++;
+              cout << "Key: " << key.data << " Parent: " << parentPtr << " numkeys: " << parent.info.numkeys << endl;
 
               // cout << "parentPtr: " << parentPtr << endl;
               // cout << "parent node type: " << parent.info.nodetype << endl;
@@ -699,6 +705,9 @@ ERROR_T BTreeIndex::Insert(const KEY_T &key, const VALUE_T &value)
               // TODO: I think this should be the right node and not the left.
               parent.SetPtr(insertionPoint+1, rightInterior);
               parent.SetKey(insertionPoint, middle);
+
+              parent.Serialize(buffercache, parentPtr);
+              parent.Unserialize(buffercache, parentPtr);
             }
         } 
         // If we're just dealing with an interior node, then move the keys over
@@ -919,7 +928,7 @@ ERROR_T BTreeIndex::Bubble(SIZE_T &n, KEY_T& key, SIZE_T &child) {
   // Increment the number of keys the parent is going to have
   node.info.numkeys++;
 
-  cout << "Node: " << n << endl;
+  cout << "Nodez: " << n << endl;
   cout << "Key to insert: " << key.data << endl;
   cout << "Insertion Point: " << insertionPoint << endl;
   cout << "node numkeys: " << node.info.numkeys << endl;
