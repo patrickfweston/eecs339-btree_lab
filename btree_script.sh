@@ -30,7 +30,21 @@ clear
 ./btree_insert mydisk 64 bja 12
 ./btree_insert mydisk 64 bka 19
 ./btree_insert mydisk 64 bla 19
-
+./btree_insert mydisk 64 dab 19
+./btree_insert mydisk 64 dac 19
+./btree_insert mydisk 64 dad 19
+./btree_insert mydisk 64 dae 19
+./btree_insert mydisk 64 daf 19
+./btree_insert mydisk 64 dag 19
+./btree_insert mydisk 64 bbp 19
+./btree_insert mydisk 64 bbo 19
+./btree_insert mydisk 64 bbt 19
+./btree_insert mydisk 64 bbq 19
+./btree_insert mydisk 64 bbs 19
+./btree_insert mydisk 64 bbe 19
+#./btree_insert mydisk 64 bbz 19
+#./btree_insert mydisk 64
+#./btree_insert mydisk 64
 #./btree_insert mydisk 64 oja 12
 #./btree_insert mydisk 64 oka 19
 #./btree_insert mydisk 64 ola 19

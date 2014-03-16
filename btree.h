@@ -124,7 +124,7 @@ public:
   ERROR_T LookupForInsert(const SIZE_T &node, const KEY_T &key, SIZE_T &returnVal);
 
 // A special user defined function to look up for insert
-  ERROR_T LookupParent(const SIZE_T &node, const KEY_T &key, SIZE_T& previous, SIZE_T &returnVal);
+  ERROR_T LookupParent(const SIZE_T &node, KEY_T &key, SIZE_T& previous, SIZE_T &returnVal);
 
   // Here you should figure out if your index makes sense
   // Is it a tree?  Is it in order?  Is it balanced?  Does each node have

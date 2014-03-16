@@ -1,0 +1,756 @@
+[H[2JInserting root node.
+Write root back to disk.
+1 = 1
+NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 1
+offset: 1
+numslots: 10
+full: 6
+NODE TYPE: 4Node: 1
+Leaf
+returnParent: 1
+B node: 1
+NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 2
+offset: 2
+numslots: 10
+full: 6
+NODE TYPE: 4Node: 1
+Leaf
+returnParent: 1
+B node: 1
+NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 3
+offset: 1
+numslots: 10
+full: 6
+NODE TYPE: 4Node: 1
+Leaf
+returnParent: 1
+B node: 1
+NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 4
+offset: 4
+numslots: 10
+full: 6
+NODE TYPE: 4Node: 1
+Leaf
+returnParent: 1
+B node: 1
+NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 5
+offset: 5
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 1 b.info.parent: 1
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 1
+superblock.info.rootnode (before) 1
+NODE TYPE: 4Node: 1
+Leaf
+parent pointer: 1parentPtr 1
+superblock 1
+Full capacity: 6 Num keys: 5
+---------- CASE: Root is full ----------
+Num keys: 5 root full: 6
+Super root node type4
+superblock.info.rootnode (after) 3
+Inserting into new node: 3
+Middle: Block(length=3, data=0x636161, lastaccessed=-1, dirty=0)
+RIGHT: 2 parent: 3
+Left child: 1 Right child: 2
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+returnParent: 3
+B node: 1
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x666161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+
+
+Inserting into leaf
+ptr: 2
+num keys: 3
+offset: 3
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x636161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 2
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x676161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+
+
+Inserting into leaf
+ptr: 2
+num keys: 4
+offset: 4
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x636161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 2
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x686161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+
+
+Inserting into leaf
+ptr: 2
+num keys: 5
+offset: 5
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 3
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 1
+ptr: 2 key: Block(length=3, data=0x686161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+parent pointer: 3parentPtr 3
+superblock 3
+Full capacity: 6 Num keys: 1
+---------- CASE: Root is NOT full ----------
+Middle Block(length=3, data=0x666161, lastaccessed=-1, dirty=0)
+parentPtr: 3
+parent node type: 2
+parent node number of nodes 2
+Offset in this loop: 1
+Position value: 1
+Right interior: 4
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+Interior
+recurse?
+ptr: 2NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 2
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x696161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+
+
+Inserting into leaf
+ptr: 4
+num keys: 3
+offset: 3
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x666161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+returnParent: 3
+B node: 4
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 3
+offset: 2
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+returnParent: 3
+B node: 1
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x6a6161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+
+
+Inserting into leaf
+ptr: 4
+num keys: 4
+offset: 4
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x666161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+returnParent: 3
+B node: 4
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x6b6161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+
+
+Inserting into leaf
+ptr: 4
+num keys: 5
+offset: 5
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 3
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 2
+ptr: 4 key: Block(length=3, data=0x6b6161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 4
+Leaf
+parent pointer: 3parentPtr 3
+superblock 3
+Full capacity: 6 Num keys: 2
+---------- CASE: Root is NOT full ----------
+Middle Block(length=3, data=0x696161, lastaccessed=-1, dirty=0)
+parentPtr: 3
+parent node type: 2
+parent node number of nodes 3
+Offset in this loop: 2
+Position value: 2
+Right interior: 5
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 4NODE TYPE: 4Node: 4
+Leaf
+returnParent: 3
+B node: 4
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+ptr: 5 key: Block(length=3, data=0x6c6161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+
+
+Inserting into leaf
+ptr: 5
+num keys: 3
+offset: 3
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+ptr: 5 key: Block(length=3, data=0x696161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+returnParent: 3
+B node: 5
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 4
+offset: 1
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+returnParent: 3
+B node: 1
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+
+
+Inserting into leaf
+ptr: 1
+num keys: 5
+offset: 2
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 3
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+parent pointer: 3parentPtr 3
+superblock 3
+Full capacity: 6 Num keys: 3
+---------- CASE: Root is NOT full ----------
+Middle Block(length=3, data=0x616861, lastaccessed=-1, dirty=0)
+parentPtr: 3
+parent node type: 2
+parent node number of nodes 4
+Offset in this loop: 0
+Position value: 3
+Right interior: 6
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 1NODE TYPE: 4Node: 1
+Leaf
+returnParent: 3
+B node: 1
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+
+
+Inserting into leaf
+ptr: 6
+num keys: 3
+offset: 1
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+returnParent: 3
+B node: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+
+
+Inserting into leaf
+ptr: 6
+num keys: 4
+offset: 3
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+returnParent: 3
+B node: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+
+
+Inserting into leaf
+ptr: 6
+num keys: 5
+offset: 4
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 3
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+parent pointer: 3parentPtr 3
+superblock 3
+Full capacity: 6 Num keys: 4
+---------- CASE: Root is NOT full ----------
+Middle Block(length=3, data=0x616b61, lastaccessed=-1, dirty=0)
+parentPtr: 3
+parent node type: 2
+parent node number of nodes 5
+Offset in this loop: 1
+Position value: 4
+Right interior: 7
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+returnParent: 3
+B node: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+Interior
+recurse?
+ptr: 2NODE TYPE: 4Node: 2
+Leaf
+
+
+Inserting into leaf
+ptr: 2
+num keys: 3
+offset: 1
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+Interior
+recurse?
+ptr: 2NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 2
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+Interior
+recurse?
+ptr: 2NODE TYPE: 4Node: 2
+Leaf
+
+
+Inserting into leaf
+ptr: 2
+num keys: 4
+offset: 2
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+Interior
+recurse?
+ptr: 2NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 2
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+ptr: 5 key: Block(length=3, data=0x746a61, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+
+
+Inserting into leaf
+ptr: 5
+num keys: 4
+offset: 4
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+ptr: 5 key: Block(length=3, data=0x696161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+returnParent: 3
+B node: 5
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+ptr: 5 key: Block(length=3, data=0x746b61, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+
+
+Inserting into leaf
+ptr: 5
+num keys: 5
+offset: 5
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 3
+NODE TYPE: 2Node: 3
+Number of keys in interior/root: 5
+ptr: 5 key: Block(length=3, data=0x746b61, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 5
+Leaf
+parent pointer: 3parentPtr 3
+superblock 3
+Full capacity: 6 Num keys: 5
+---------- CASE: Root is full ----------
+Num keys: 5 root full: 6
+Super root node type2
+superblock.info.rootnode (after) 9
+Inserting into new node: 9
+Middle: Block(length=3, data=0x6c6161, lastaccessed=-1, dirty=0)
+-------- ROOT NODE CASE --------
+New root right child ptr: 10
+Parent ptr: 3
+Left keys: 3 Right keys: 3
+Insertion point: 5
+Transferring key: 4
+Transferring key: 5
+Transferring ptr: 3
+Transferring ptr: 4
+Transferring ptr: 5
+Left child: 5 Right child: 8
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+ptr: 2 key: Block(length=3, data=0x696161, lastaccessed=-1, dirty=0)
+NODE TYPE: 4Node: 2
+Leaf
+returnParent: 3
+B node: 5
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+
+
+Inserting into leaf
+ptr: 7
+num keys: 3
+offset: 3
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+returnParent: 3
+B node: 7
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+
+
+Inserting into leaf
+ptr: 7
+num keys: 4
+offset: 4
+numslots: 10
+full: 6
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+returnParent: 3
+B node: 7
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+
+
+Inserting into leaf
+ptr: 7
+num keys: 5
+offset: 5
+numslots: 10
+full: 6
+Left: 3 Right: 3
+Allocated?
+rightLeafNode.info.parent: 3 b.info.parent: 3
+Get from: 3 and store in: 0
+Get from: 4 and store in: 1
+Get from: 5 and store in: 2
+b.info.numkeys 3
+
+
+b.info.parent 3
+superblock.info.rootnode (before) 9
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 3
+Interior
+recurse?
+ptr: 7NODE TYPE: 4Node: 7
+Leaf
+parent pointer: 3parentPtr 3
+superblock 9
+---------- CASE: Interior node ----------
+INTERIOR:
+numslots: 13 full: 8
+Current node: 11
+Node's parent: 3
+Middle Block(length=3, data=0x626a61, lastaccessed=-1, dirty=0)
+Number parent keys: 4
+
+
+
+parentPtr: 3
+parent node type: 2
+Key Position: 3
+Insertion point: 2
+Setting the keys and ptr
+parent's num keys 4 full: 8
+-------------------------------- WHILE ------------- 
+NODE TYPE: 2Node: 9
+Number of keys in interior/root: 1
+Interior
+recurse?
+ptr: 3NODE TYPE: 2Node: 3
+Number of keys in interior/root: 4
+Interior
+recurse?
+ptr: 6NODE TYPE: 4Node: 6
+Leaf
+returnParent: 3
+B node: 7
+9: Interior: *3 laa *10 
+3: Interior: *1 aha *6 bja *11 caa *7 caa *2 
+1: Leaf: *0 aaa 15     afa 9      aga 4      
+6: Leaf: *0 aha 12     aia 15     aja 12     
+11: Leaf: *0 bja 12     bka 19     bla 19     
+7: Leaf: *0 aka 19     ala 19     baa 4      
+2: Leaf: *0 caa 8      cja 12     cka 19     daa 6      eaa 5      
+10: Interior: *4 iaa *5 laa *8 
+4: Leaf: *0 faa 9      gaa 4      haa 12     
+5: Leaf: *0 iaa 15     jaa 12     kaa 19     
+8: Leaf: *0 laa 19     tja 12     tka 19     
